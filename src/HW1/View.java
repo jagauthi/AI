@@ -24,13 +24,7 @@ public class View extends JPanel implements MouseListener {
 
 	public void mousePressed(MouseEvent e)
 	{
-		state[rand.nextInt(22)] += (rand.nextInt(2) == 0 ? -1 : 1);
-
-		for(int i = 0; i < 11; i++)
-		System.out.print("(" + state[2 * i] + "," +
-			state[2 * i + 1] + ") ");
-		System.out.println();
-		viz.repaint();
+		
 	}
 
 	public void mouseReleased(MouseEvent e) {    }

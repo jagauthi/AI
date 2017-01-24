@@ -1,6 +1,8 @@
-import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.TreeSet;
 
 public class Solver {
@@ -27,42 +29,43 @@ public class Solver {
 	    while(Q.size() > 0) {
 	    	GameState current = Q.pop();
 	    	if(isGoal(current)) {
-	    		writeAnswer(current);
+	    		getAnswer(current);
 	    		return current;
 	    	}
 	    	
 	    	for(int i = 0; i < 22; i += 2) {
-	    		GameState n = new GameState(current);
+	    		GameState n1 = new GameState(current);
+	    		GameState n2 = new GameState(current);
+	    		GameState n3 = new GameState(current);
+	    		GameState n4 = new GameState(current);
 	    		
-    			n.state[i] += 1;
-	    		if( ( !S.contains(n) ) && ( isValidState(n) ) ) {
-	    			S.add(n);
-	    			Q.add(n);
-	    			//v.getNewState(n);
+    			n1.state[i] += 1;
+	    		if( ( !S.contains(n1) ) && ( isValidState(n1) ) ) {
+	    			S.add(n1);
+	    			Q.add(n1);
+	    			v.getNewState(n1);
 	    		}
 	    		
-    			n.state[i] -= 2;
-	    		if( (!S.contains(n) ) && ( isValidState(n) ) ) {
-	    			S.add(n);
-	    			Q.add(n);
-	    			//v.getNewState(n);
-	    		}
-	    		n.state[i] += 1;
-	    		
-    			n.state[i+1] += 1;
-	    		if( (!S.contains(n) ) && ( isValidState(n) ) ) {
-	    			S.add(n);
-	    			Q.add(n);
-	    			//v.getNewState(n);
+    			n2.state[i] -= 1;
+	    		if( (!S.contains(n2) ) && ( isValidState(n2) ) ) {
+	    			S.add(n2);
+	    			Q.add(n2);
+	    			v.getNewState(n2);
 	    		}
 	    		
-    			n.state[i+1] -= 2;
-	    		if( (!S.contains(n) ) && ( isValidState(n) ) ) {
-	    			S.add(n);
-	    			Q.add(n);
-	    			//v.getNewState(n);
+    			n3.state[i+1] += 1;
+	    		if( (!S.contains(n3) ) && ( isValidState(n3) ) ) {
+	    			S.add(n3);
+	    			Q.add(n3);
+	    			v.getNewState(n3);
 	    		}
-	    		n.state[i+1] += 1;
+	    		
+    			n4.state[i+1] -= 1;
+	    		if( (!S.contains(n4) ) && ( isValidState(n4) ) ) {
+	    			S.add(n4);
+	    			Q.add(n4);
+	    			v.getNewState(n4);
+	    		}
 	    	}
 	    }
 	    return null;
@@ -74,8 +77,8 @@ public class Solver {
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 0, 0, 0, 0, 1, 1, 1,
 			1, 1, 0, 0, 0, 0, 0, 0, 1, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+			1, 0, 0, 1, 1, 0, 0, 0, 0, 1,
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 			1, 1, 0, 0, 0, 0, 0, 0, 1, 1,
@@ -141,17 +144,36 @@ public class Solver {
 			return false;
 	}
 	
-	public void writeAnswer(GameState state)
+	public void getAnswer(GameState state)
 	{
 		GameState current = state;
 		GameState previous = current.prev;
+		ArrayList<String> answer = new ArrayList<String>();
 		while(previous != null)
 		{
-			System.out.println(current.getStateAsString());
+			answer.add(current.getStateAsString());
 			current = previous;
 			previous = current.prev;
 		}
+		writeToFile("results.txt", answer);
 	}
+	
+	public void writeToFile(String fileName, ArrayList<String> answer)
+	{
+        try {
+            FileWriter fileWriter = new FileWriter(fileName);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            for(int i = answer.size()-1; i >= 0; i--)
+            {
+                bufferedWriter.write(answer.get(i));
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 
