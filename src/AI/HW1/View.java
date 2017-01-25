@@ -1,3 +1,4 @@
+package HW1;
 
 import javax.swing.JPanel;
 import java.awt.Graphics;

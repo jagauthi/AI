@@ -1,3 +1,4 @@
+package HW1;
 
 public class GameState
 {
