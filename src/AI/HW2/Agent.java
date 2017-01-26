@@ -8,12 +8,14 @@ import java.awt.Color;
 class Agent {
 	
 	Planner planner;
-	ArrayList<Node> steps;
+	Node goalState;
+	Node nextStep;
 	
 	public Agent()
 	{
 		planner = new Planner();
-		steps = new ArrayList<Node>();
+		goalState = new Node(0, null, 100, 100);
+		nextStep = new Node(0, null, 100, 100);
 	}
 
 	void drawPlan(Graphics g, Model m) {
@@ -27,36 +29,42 @@ class Agent {
 		while(true)
 		{
 			MouseEvent e = c.nextMouseEvent();
-			if(e == null) {
-				if(steps.size() > 1)
+			if(e == null) {/*
+				if(m.getDistanceToDestination(goalState) > 10)
 				{
-					System.out.println(steps.size());
-					m.setDestination(steps.get(0).state[0], steps.get(0).state[1]);
-					steps.remove(0);
+					Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
+					nextStep = getNextStep(answer);
+					m.setDestination(nextStep.state[0], nextStep.state[1]);
 				}
 				break;
 			}
 			else {
-				steps.clear();
-				Node goalState = new Node(0, null, e.getX(), e.getY());
+				goalState = new Node(0, null, e.getX(), e.getY());
+			}
+			*/
+				break;
+			}
+			else
+			{
+				goalState = new Node(0, null, e.getX(), e.getY());
 				Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
-				steps = getSteps(answer);
+				m.setDestination(e.getX(), e.getY());
 			}
 			
 		}
 	}
 	
-	public ArrayList<Node> getSteps(Node finalNode)
+	public Node getNextStep(Node finalNode)
 	{
 		Node current = finalNode;
-		ArrayList<Node> answer = new ArrayList<Node>();
+		Node prev = current.parent;
 		
-		while(current.parent != null)
+		while(prev.parent != null)
 		{
-			answer.add(0, current); //Inserts the next step into the array list
-			current = current.parent;
+			current = prev;
+			prev = current.parent;
 		}
-		return answer;
+		return current;
 	}
 
 	public static void main(String[] args) throws Exception

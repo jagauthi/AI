@@ -26,10 +26,14 @@ public class Planner {
 		beenThere.add(startNode);
 		frontier.add(startNode);
 		
+		
 		while(frontier.size() > 0) {
 			Node s = frontier.remove(); // get lowest-cost state
 			if(isGoal(s, goalState))
+			{
+				printPath(s);
 				return s;
+			}
 			
 			ArrayList<Node> neighbors = findNeighbors(s);
 			for( Node child : neighbors ) {
@@ -85,9 +89,11 @@ public class Planner {
 	
 	public boolean isGoal(Node node, Node goalNode)
 	{
+		/*
 		System.out.println("Node: " + node.state[0] + ", " + node.state[1]);
 		System.out.println("Goal: " + goalNode.state[0] + ", " + goalNode.state[1]);
 		System.out.println();
+		*/
 		if( (node.state[0] > goalNode.state[0] - 10) && (node.state[0] < goalNode.state[0] + 10) ) {
 			if( (node.state[1] > goalNode.state[1] - 10) && (node.state[1] < goalNode.state[1] + 10) ) {
 				return true;
@@ -97,6 +103,18 @@ public class Planner {
 		}
 		else
 			return false;
+	}
+	
+	public void printPath(Node node)
+	{
+		Node current = node;
+		System.out.println();
+		while(current.parent != null)
+		{
+			System.out.println(current.getStateAsString());
+			current = current.parent;
+		}
+		System.out.println();
 	}
 }
 
