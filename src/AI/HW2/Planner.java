@@ -31,13 +31,12 @@ public class Planner {
 			Node s = frontier.remove(); // get lowest-cost state
 			if(isGoal(s, goalState))
 			{
-				printPath(s);
 				return s;
 			}
 			
 			ArrayList<Node> neighbors = findNeighbors(s);
 			for( Node child : neighbors ) {
-				double acost = actionCost(s, child); // compute the cost of the action
+				double acost = actionCost(child); // compute the cost of the action
 				child.cost = s.cost + acost;
 				if(beenThere.contains(child)) {
 					Node oldChild = beenThere.floor(child);
@@ -57,9 +56,12 @@ public class Planner {
 		return null;
 	}
 	
-	public double actionCost(Node source, Node goal)
+	public double actionCost(Node source)
 	{
-		return m.getTravelSpeed(source.state[0], source.state[1]) * 100;
+		if(source.state[0] > 0 && source.state[0] < m.XMAX && source.state[1] > 0 && source.state[1] < m.YMAX)
+			return 1/m.getTravelSpeed(source.state[0], source.state[1]) * 100;
+		else
+			return 1;
 		//return Math.sqrt( Math.pow((goal.state[0] - source.state[0]), 2) + Math.pow((goal.state[1] - source.state[1]), 2) );
 		/*
 		if(source.state[0] == goal.state[0] || source.state[1] == goal.state[1])
@@ -89,11 +91,6 @@ public class Planner {
 	
 	public boolean isGoal(Node node, Node goalNode)
 	{
-		/*
-		System.out.println("Node: " + node.state[0] + ", " + node.state[1]);
-		System.out.println("Goal: " + goalNode.state[0] + ", " + goalNode.state[1]);
-		System.out.println();
-		*/
 		if( (node.state[0] > goalNode.state[0] - 10) && (node.state[0] < goalNode.state[0] + 10) ) {
 			if( (node.state[1] > goalNode.state[1] - 10) && (node.state[1] < goalNode.state[1] + 10) ) {
 				return true;

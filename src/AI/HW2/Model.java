@@ -46,6 +46,7 @@ class Model {
 	// 0 <= x < MAP_WIDTH.
 	// 0 <= y < MAP_HEIGHT.
 	float getTravelSpeed(float x, float y) {
+		System.out.println("X: " + x + "\nY: " + y);
 			int xx = (int)(x * 0.1f);
 			int yy = (int)(y * 0.1f);
 			if(xx >= 60)
@@ -55,6 +56,10 @@ class Model {
 			}
 			int pos = 4 * (60 * yy + xx);
 			return Math.max(0.2f, Math.min(3.5f, -0.01f * (terrain[pos + 1] & 0xff) + 0.02f * (terrain[pos + 3] & 0xff)));
+	}
+	
+	float myGetTravelSpeed(float x, float y) {
+		return terrain[(int) (y*YMAX + x)];
 	}
 
 	Controller getController() { return controller; }
@@ -76,7 +81,7 @@ class Model {
 	
 	double getDistanceToDestination(Node goal) { 
 		Sprite s = sprites.get(0);
-		return Math.sqrt((s.x - goal.state[0]) * (s.x - goal.state[0]) + (s.x - goal.state[1]) * (s.x - goal.state[1]));
+		return Math.sqrt((goal.state[0] -s.x) * (goal.state[0] -s.x) + (goal.state[1] - s.y) * (goal.state[1] - s.y));
 	}
 
 	class Sprite {
