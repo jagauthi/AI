@@ -73,6 +73,11 @@ class Model {
 		Sprite s = sprites.get(sprite);
 		return Math.sqrt((s.x - s.xDestination) * (s.x - s.xDestination) + (s.y - s.yDestination) * (s.y - s.yDestination));
 	}
+	
+	double getDistanceToDestination(Node goal) { 
+		Sprite s = sprites.get(0);
+		return Math.sqrt((s.x - goal.state[0]) * (s.x - goal.state[0]) + (s.x - goal.state[1]) * (s.x - goal.state[1]));
+	}
 
 	class Sprite {
 		float x;

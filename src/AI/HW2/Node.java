@@ -4,7 +4,7 @@ public class Node {
 	
 	double cost;
 	Node parent;
-	byte[] state;
+	int[] state;
 	
 	public Node(double cost, Node parent) {
 		
@@ -15,22 +15,29 @@ public class Node {
 			state = parent.state;
 		}
 		else {
-			state = new byte[2];
+			state = new int[2];
+			state[0] = 100;
+			state[1] = 100;
 		}
 	}
 
-	public Node(double cost, Node parent, byte x, byte y) {
+	public Node(double cost, Node parent, int x, int y) {
 	
 		this.cost = cost;
 		this.parent = parent;
-		state = new byte[2];
+		state = new int[2];
 		state[0] = x;
 		state[1] = y;
 	}
 	
-	public void setState(byte x, byte y)
+	public void setState(int x, int y)
 	{
 		state[0] = x;
 		state[1] = y;
+	}
+	
+	public String getStateAsString()
+	{
+		return "(" + state[0] + "," + state[1] + ")";
 	}
 }
