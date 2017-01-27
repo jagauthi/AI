@@ -62,14 +62,7 @@ public class Planner {
 		if(source.state[0] > 0 && source.state[0] < m.XMAX && source.state[1] > 0 && source.state[1] < m.YMAX)
 			return 1/m.getTravelSpeed(source.state[0], source.state[1]) * 100;
 		else
-			return 1;
-		//return Math.sqrt( Math.pow((goal.state[0] - source.state[0]), 2) + Math.pow((goal.state[1] - source.state[1]), 2) );
-		/*
-		if(source.state[0] == goal.state[0] || source.state[1] == goal.state[1])
-			return 1.0;
-		else
-			return Math.sqrt(2);
-			*/
+			return 9999;
 	}
 	
 	public ArrayList<Node> findNeighbors(Node n)
@@ -120,6 +113,3 @@ public class Planner {
 		return frontier;
 	}
 }
-
-
-
