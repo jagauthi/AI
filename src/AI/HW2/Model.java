@@ -46,7 +46,6 @@ class Model {
 	// 0 <= x < MAP_WIDTH.
 	// 0 <= y < MAP_HEIGHT.
 	float getTravelSpeed(float x, float y) {
-		System.out.println("X: " + x + "\nY: " + y);
 			int xx = (int)(x * 0.1f);
 			int yy = (int)(y * 0.1f);
 			if(xx >= 60)

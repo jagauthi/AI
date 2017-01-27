@@ -20,12 +20,13 @@ public class Planner {
 	}
 	
 	public Node UCS(Node goalState, Sprite player, Model m) {
+		beenThere.clear();
+		frontier.clear();
 		this.m = m;
 		Node startNode = new Node(0.0, null, (int)player.x, (int)player.y);
 		
 		beenThere.add(startNode);
 		frontier.add(startNode);
-		
 		
 		while(frontier.size() > 0) {
 			Node s = frontier.remove(); // get lowest-cost state

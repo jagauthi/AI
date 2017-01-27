@@ -13,6 +13,8 @@ public class Solver {
 	Viz v;
 	int[] map;
 	
+	long startTime = 0;
+	
 	public Solver(Viz v)
 	{
 		this.v = v;
@@ -22,8 +24,8 @@ public class Solver {
 
 	public GameState BFS()
 	{
+		startTime = System.currentTimeMillis();
 		Q = new LinkedList<GameState>();
-		
 		GameState root = new GameState(null);
 		Q.add(root);
         
@@ -31,6 +33,7 @@ public class Solver {
 	    	GameState current = Q.pop();
 	    	if(isGoal(current)) {
 	    		getAnswer(current);
+	    		System.out.println(System.currentTimeMillis() - startTime + " milliseconds");
 	    		return current;
 	    	}
 	    	

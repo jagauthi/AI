@@ -28,46 +28,42 @@ class Agent {
 	void update(Model m)
 	{
 		Controller c = m.getController();
-		while(true)
-		{
+		while(true) {
 			MouseEvent e = c.nextMouseEvent();
 			if(e == null) {
-				if(m.getDistanceToDestination(goalState) == 0)
+				if(m.getDistanceToDestination(goalState) == 0){
 					break;
+				}
 				
-				if(m.getDistanceToDestination(nextStep) == 0 && started)
-				{
+				if(m.getDistanceToDestination(nextStep) == 0 && started) {
 					Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
 					nextStep = getNextStep(answer);
 					m.setDestination(nextStep.state[0], nextStep.state[1]);
 				}
 				break;
 			}
-			else
-			{
+			else {
 				goalState = new Node(0, null, e.getX(), e.getY());
 				Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
 				nextStep = getNextStep(answer);
 				m.setDestination(nextStep.state[0], nextStep.state[1]);
 				started = true;
 			}
-			
 		}
 	}
 	
 	public Node getNextStep(Node finalNode)
 	{
 		Node current = finalNode;
-		Node prev = current.parent;
-		if(prev == null)
+		Node answer = finalNode;
+		if(current == null)
 			return current;
 		
-		while(prev.parent != null)
-		{
-			current = prev;
-			prev = current.parent;
+		while(current.parent != null) {
+			answer = current;
+			current = current.parent;
 		}
-		return current;
+		return answer;
 	}
 
 	public static void main(String[] args) throws Exception
