@@ -56,7 +56,6 @@ class Agent {
 			}
 			else {
 				goalState = new Node(0, null, e.getX(), e.getY());
-				System.out.println(m.getDistanceToDestination(goalState));
 				Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
 				frontier = planner.getFrontier();
 				nextStep = getNextStep(answer);
