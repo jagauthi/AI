@@ -114,6 +114,11 @@ public class Planner {
 		}
 		System.out.println();
 	}
+	
+	public PriorityQueue<Node> getFrontier()
+	{
+		return frontier;
+	}
 }
 
 
