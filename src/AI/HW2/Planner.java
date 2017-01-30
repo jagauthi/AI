@@ -11,17 +11,20 @@ public class Planner {
 	
 	TreeSet<Node> beenThere;
 	PriorityQueue<Node> frontier;
+	PriorityQueue<Node> aStarFrontier;
 	Model m;
 	
 	public Planner()
 	{
 		beenThere = new TreeSet<Node>(new StateComparator());
 		frontier = new PriorityQueue<Node>(new CostComparator());
+		aStarFrontier = new PriorityQueue<Node>(new FCostComparator());
 	}
 	
 	public Node UCS(Node goalState, Sprite player, Model m) {
 		beenThere.clear();
 		frontier.clear();
+		aStarFrontier.clear();
 		this.m = m;
 		Node startNode = new Node(0.0, null, (int)player.x, (int)player.y);
 		
@@ -55,6 +58,68 @@ public class Planner {
 			}
 		}
 		return null;
+	}
+	
+	public Node AStar(Node goalState, Sprite player, Model m) {
+		beenThere.clear();
+		frontier.clear();
+		aStarFrontier.clear();
+		this.m = m;
+		float maxSpeed = findMaxSpeed();
+		Node startNode = new Node(0.0, null, (int)player.x, (int)player.y);
+		
+		beenThere.add(startNode);
+		aStarFrontier.add(startNode);
+		
+		while(aStarFrontier.size() > 0) {
+			Node s = aStarFrontier.remove(); // get lowest-cost state
+			if(isGoal(s, goalState))
+			{
+				return s;
+			}
+			
+			ArrayList<Node> neighbors = findNeighbors(s);
+			for( Node child : neighbors ) {
+				double acost = actionCost(child); // compute the cost of the action
+				double fcost = acost + heuristic(child, goalState, maxSpeed); // compute the cost of the action
+				child.cost = s.cost + acost;
+				if(beenThere.contains(child)) {
+					Node oldChild = beenThere.floor(child);
+					if(s.cost + acost < oldChild.cost) {
+						oldChild.cost = s.cost + acost;
+						oldChild.fCost = oldChild.cost + fcost;
+						oldChild.parent = s;
+					}
+				}
+				else {
+					child.cost = s.cost + acost;
+					child.fCost = child.cost + fcost;
+					child.parent = s;
+					aStarFrontier.add(child);
+					beenThere.add(child);
+				}
+			}
+		}
+		return null;
+	}
+	
+	public float findMaxSpeed()
+	{
+		float maxSpeed = 0.0f;
+		for(float y = 0; y < m.YMAX; y += 1)
+		{
+			for(float x = 0; x < m.XMAX; x += 1)
+			{
+				if(m.getTravelSpeed(x, y) > maxSpeed)
+					maxSpeed = m.getTravelSpeed(x, y);
+			}
+		}
+		return maxSpeed;
+	}
+	
+	public double heuristic(Node source, Node goal, float maxSpeed)
+	{
+		return ( Math.sqrt( Math.pow(goal.state[1]-source.state[1], 2) + Math.pow(goal.state[0]-source.state[0], 2) ) * maxSpeed );
 	}
 	
 	public double actionCost(Node source)
@@ -111,5 +176,10 @@ public class Planner {
 	public PriorityQueue<Node> getFrontier()
 	{
 		return frontier;
+	}
+	
+	public PriorityQueue<Node> getAStarFrontier()
+	{
+		return aStarFrontier;
 	}
 }

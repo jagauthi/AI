@@ -14,13 +14,17 @@ class Agent {
 	ArrayList<Node> path;
 	boolean started;
 	PriorityQueue<Node> frontier;
+	PriorityQueue<Node> aStarFrontier;
+	int algorithmChoice;
 	
 	public Agent()
 	{
 		started = false;
+		algorithmChoice = 1; //1 for UCS, 2 for AStar
 		planner = new Planner();
 		path = new ArrayList<Node>();
 		frontier = new PriorityQueue<Node>();
+		aStarFrontier = new PriorityQueue<Node>();
 		goalState = new Node(0, null, 100, 100);
 		nextStep = new Node(0, null, 100, 100);
 	}
@@ -34,6 +38,10 @@ class Agent {
 			Node node = frontier.poll();
 			g.drawOval(node.state[0], node.state[1], 10, 10);
 		}
+		for(int x = 0; x < aStarFrontier.size(); x++) {
+			Node node = aStarFrontier.poll();
+			g.drawOval(node.state[0], node.state[1], 10, 10);
+		}
 	}
 
 	void update(Model m)
@@ -45,9 +53,14 @@ class Agent {
 				if(m.getDistanceToDestination(goalState) == 0){
 					break;
 				}
-				
 				if(m.getDistanceToDestination(nextStep) == 0 && started) {
-					Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
+					Node answer;
+					if(algorithmChoice == 1) {
+						answer = planner.UCS(goalState, m.getSprites().get(0), m);
+					}
+					else {
+						answer = planner.AStar(goalState, m.getSprites().get(0), m);
+					}
 					//frontier = planner.getFrontier();
 					nextStep = getNextStep(answer);
 					m.setDestination(nextStep.state[0], nextStep.state[1]);
@@ -55,9 +68,22 @@ class Agent {
 				break;
 			}
 			else {
+				if(e.getButton() == 1) {
+					algorithmChoice = 1;
+				}
+				else {
+					algorithmChoice = 2;
+				}
 				goalState = new Node(0, null, e.getX(), e.getY());
-				Node answer = planner.UCS(goalState, m.getSprites().get(0), m);
+				Node answer;
+				if(algorithmChoice == 1) {
+					answer = planner.UCS(goalState, m.getSprites().get(0), m);
+				}
+				else {
+					answer = planner.AStar(goalState, m.getSprites().get(0), m);
+				}
 				frontier = planner.getFrontier();
+				aStarFrontier = planner.getAStarFrontier();
 				nextStep = getNextStep(answer);
 				m.setDestination(nextStep.state[0], nextStep.state[1]);
 				started = true;

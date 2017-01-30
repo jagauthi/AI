@@ -3,12 +3,14 @@ package HW2;
 public class Node {
 	
 	double cost;
+	double fCost;
 	Node parent;
 	int[] state;
 	
 	public Node(double cost, Node parent) {
 		
 		this.cost = cost;
+		this.fCost = 0;
 		this.parent = parent;
 		
 		if(parent != null) {
@@ -34,6 +36,11 @@ public class Node {
 	{
 		state[0] = x;
 		state[1] = y;
+	}
+	
+	public void setFCost(double x)
+	{
+		fCost = x;
 	}
 	
 	public String getStateAsString()
