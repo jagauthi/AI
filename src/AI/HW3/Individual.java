@@ -3,11 +3,13 @@ package HW3;
 public class Individual {
 	
 	static int geneLength = 291;
-    private double[] genes;
+    double[] genes;
+    NeuralAgent agent;
     
 	public Individual()
 	{
 		genes = new double[geneLength];
+		agent = new NeuralAgent(genes);
 	}
     
     public double getGene(int index) {
@@ -16,6 +18,15 @@ public class Individual {
 
     public void setGene(int index, double value) {
         genes[index] = value;
+    }
+    
+    public int size() {
+        return genes.length;
+    }
+    
+    public void generateAgent()
+    {
+    	agent = new NeuralAgent(genes);
     }
 
     @Override

@@ -26,5 +26,23 @@ class Game {
 		//Controller.doBattle(new HumanAgent(), new NeuralAgent(bob));
 		
 		Evolver evolver = new Evolver();
+		Population finalPopulation = evolver.evolvePopulation();
+		NeuralAgent myAgent = new NeuralAgent(finalPopulation.getFittest().genes);
+		for(int i = 0; i < myAgent.nn.layers.size(); i++)
+		{
+			myAgent.nn.layers.get(i).weights.saveARFF("WinnerPart" + (i+1) + ".arff");
+		}
+		//printGenes(finalPopulation.getFittest().genes);
+		Controller.doBattle(myAgent, new NeuralAgent(bob));
+	}
+	
+	public static void printGenes(double[] genes)
+	{
+		for(int i = 0; i < genes.length; i++) {
+			if(i%5 == 0)
+				System.out.println();
+			System.out.print(genes[i] + ",");
+		}
+		System.out.println();
 	}
 }
