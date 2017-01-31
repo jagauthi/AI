@@ -18,15 +18,14 @@ class Game {
 
 	public static void main(String[] args) throws Exception {
 
-		//Controller.doBattle(new NeuralAgent(bob), new NeuralAgent(bob));
-
-		//Controller.doBattle(new HumanAgent(), new NeuralAgent(bob));
-
 		Random r = new Random(1234);
 		double[] randy = new double[291];
 		for(int i = 0; i < 291; i++)
 			randy[i] = 0.01 * r.nextGaussian();
-		Controller.doBattle(new NeuralAgent(randy), new NeuralAgent(bob));
-
+		//Controller.doBattle(new NeuralAgent(randy), new NeuralAgent(bob));
+		//Controller.doBattle(new NeuralAgent(bob), new NeuralAgent(bob));
+		//Controller.doBattle(new HumanAgent(), new NeuralAgent(bob));
+		
+		Evolver evolver = new Evolver();
 	}
 }
