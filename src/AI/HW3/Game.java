@@ -17,7 +17,6 @@ class Game {
 			0.09006518584694838,-0.09276188802323124,-0.12268590292443704,0.14021564255193278,0.1956167035703967,-0.03109619850814607,0.15264495326782712,-0.385147417034142};
 
 	public static void main(String[] args) throws Exception {
-
 		Random r = new Random(1234);
 		double[] randy = new double[291];
 		for(int i = 0; i < 291; i++)

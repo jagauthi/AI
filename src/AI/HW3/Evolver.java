@@ -1,4 +1,4 @@
-package AI.HW3;
+package HW3;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,8 +12,14 @@ public class Evolver {
 	{
 		numIterations = 0;
 		nn = new NeuralNet();
-		nn.layers.add(new LayerTanh(10, 2));
+		nn.layers.add(new LayerTanh(10, 291));
 		nn.init(new Random());
+		try {
+			nn.layers.get(0).weights.saveARFF("asdf.arff");
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void evolvePopulation()
