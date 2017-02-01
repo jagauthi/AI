@@ -6,7 +6,7 @@ import java.util.Random;
 public class Evolver {
 
 	int populationSize = 20;
-	double mutationRate = 0.2; //Slightly high mutation rate
+	double mutationRate = 0.2; //Slightly higher than normal mutation rate
 	double crossoverRate = 0.5;
 	ArrayList<Population> populations;
 	
@@ -35,7 +35,7 @@ public class Evolver {
 					newPopulation.saveIndividual(i, newChild);
 				}
 				
-				//Slightly mutate the population
+				//Mutate some the population for diversity
 				for(int i = 0; i < newPopulation.size(); i++) {
 					mutate(newPopulation.get(i));
 				}
@@ -44,7 +44,6 @@ public class Evolver {
 				numIterations++;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return finalPopulation;
