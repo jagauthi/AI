@@ -7,7 +7,7 @@ public class Evolver {
 
 	int populationSize = 50;
 	int tournSize = 10;
-	int numEvolutions = 15;
+	int numEvolutions = 20;
 	double mutationRate = 0.015;
 	ArrayList<Population> populations;
 	
@@ -27,7 +27,7 @@ public class Evolver {
 			Population newPopulation = new Population(populationSize, false);
 			
 			//Populate the new population with new children
-			System.out.println("\tPopulating the new population...");
+			System.out.println("\tPopulating the new generation...");
 			for(int i = 0; i < newPopulation.size(); i++) {
 				Individual i1 = getNewParent(populations.get(numIterations));
 				Individual i2 = getNewParent(populations.get(numIterations));
