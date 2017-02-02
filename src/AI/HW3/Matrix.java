@@ -1,4 +1,8 @@
 package HW3;
+// ----------------------------------------------------------------
+// The contents of this file are distributed under the CC0 license.
+// See http://creativecommons.org/publicdomain/zero/1.0/
+// ----------------------------------------------------------------
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,16 +12,17 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.lang.StringBuilder;
 
 
-/** This stores a matrix, A.K.A. data set, A.K.A. table. Each element is
- *  represented as a double value. Nominal values are represented using their
- *  corresponding zero-indexed enumeration value. For convenience,
- *  the matrix also stores some meta-data which describes the columns (or attributes)
- *  in the matrix. */
+/// This stores a matrix, A.K.A. data set, A.K.A. table. Each element is
+/// represented as a double value. Nominal values are represented using their
+/// corresponding zero-indexed enumeration value. For convenience,
+/// the matrix also stores some meta-data which describes the columns (or attributes)
+/// in the matrix.
 public class Matrix
 {
-	/** Used to represent elements in the matrix for which the value is not known. */
+	/// Used to represent elements in the matrix for which the value is not known.
 	public static final double UNKNOWN_VALUE = -1e308; 
 
 	// Data
@@ -26,53 +31,54 @@ public class Matrix
 	// Meta-data
 	private String m_filename;                          // the name of the file
 	private ArrayList<String> m_attr_name;                 // the name of each attribute (or column)
-	private ArrayList<Map<String, Integer>> m_str_to_enum; // value to enumeration
-	private ArrayList<Map<Integer, String>> m_enum_to_str; // enumeration to value
+	private ArrayList<HashMap<String, Integer>> m_str_to_enum; // value to enumeration
+	private ArrayList<HashMap<Integer, String>> m_enum_to_str; // enumeration to value
 
-	/** Creates a 0x0 matrix. (Next, to give this matrix some dimensions, you should call:
-	 *     loadARFF
-	 *     setSize
-	 *     addColumn, or
-	 *     copyMetaData */
+	/// Creates a 0x0 matrix. (Next, to give this matrix some dimensions, you should call:
+	///    loadARFF
+	///    setSize
+	///    addColumn, or
+	///    copyMetaData
 	@SuppressWarnings("unchecked")
 	public Matrix() 
 	{
 		this.m_filename    = "";
 		this.m_attr_name   = new ArrayList<String>();
-		this.m_str_to_enum = new ArrayList<Map<String, Integer>>();
-		this.m_enum_to_str = new ArrayList<Map<Integer, String>>();
+		this.m_str_to_enum = new ArrayList<HashMap<String, Integer>>();
+		this.m_enum_to_str = new ArrayList<HashMap<Integer, String>>();
 	}
 
 	public Matrix(int rows, int cols)
 	{
 		this.m_filename    = "";
 		this.m_attr_name   = new ArrayList<String>();
-		this.m_str_to_enum = new ArrayList<Map<String, Integer>>();
-		this.m_enum_to_str = new ArrayList<Map<Integer, String>>();
+		this.m_str_to_enum = new ArrayList<HashMap<String, Integer>>();
+		this.m_enum_to_str = new ArrayList<HashMap<Integer, String>>();
 		setSize(rows, cols);
 	}
 
 	public Matrix(Matrix that)
 	{
+		setSize(that.rows(), that.cols());
 		m_filename = that.m_filename;
-		m_attr_name = that.m_attr_name;
-		m_str_to_enum = that.m_str_to_enum;
-		m_enum_to_str = that.m_enum_to_str;
-		setSize(0, that.cols());
-		copyPart(that, 0, 0, that.rows(), that.cols());
+		m_attr_name = new ArrayList<String>();
+		m_str_to_enum = new ArrayList<HashMap<String, Integer>>();
+		m_enum_to_str = new ArrayList<HashMap<Integer, String>>();
+		copyBlock(0, 0, that, 0, 0, that.rows(), that.cols());
 	}
 
-	/** Loads the matrix from an ARFF file */
+	/// Loads the matrix from an ARFF file
 	public void loadARFF(String filename)
 	{
-		Map<String, Integer> tempMap  = new HashMap<String, Integer>(); //temp map for int->string map (attrInts)
-		Map<Integer, String> tempMapS = new HashMap<Integer, String>(); //temp map for string->int map (attrString)
-		
-		int attrCount                 = 0; // Count number of attributes
-		int lineNum                   = 0; // Used for exceptions
-		
+		HashMap<String, Integer> tempMap  = new HashMap<String, Integer>(); //temp map for int->string map (attrInts)
+		HashMap<Integer, String> tempMapS = new HashMap<Integer, String>(); //temp map for string->int map (attrString)
+		int attrCount = 0; // Count number of attributes
+		int lineNum = 0; // Used for exception messages
 		Scanner s = null;
-		
+		m_str_to_enum.clear();
+		m_enum_to_str.clear();
+		m_attr_name.clear();
+
 		try
 		{
 			s = new Scanner(new File(filename));
@@ -147,7 +153,7 @@ public class Matrix
 							// If the attribute is nominal
 							if (vals > 0)
 							{
-								Map<String, Integer> enumMap = m_str_to_enum.get(i);
+								HashMap<String, Integer> enumMap = m_str_to_enum.get(i);
 								if (!enumMap.containsKey(val))
 									throw new IllegalArgumentException("Unrecognized enumeration value " + val + " on line: " + lineNum + ".");
 									
@@ -172,14 +178,18 @@ public class Matrix
 		}
 	}
 
-	public void print() {
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
 		for(int j = 0; j < rows(); j++) {
-			Vec.println(row(j));
+			if(j > 0)
+				sb.append("\n");
+			sb.append(Vec.toString(row(j)));
 		}
+		return sb.toString();
 	}
 
-	/** Saves the matrix to an ARFF file */
-	public void saveARFF(String filename) throws Exception
+	/// Saves the matrix to an ARFF file
+	public void saveARFF(String filename)
 	{		
 		PrintWriter os = null;
 		
@@ -229,7 +239,7 @@ public class Matrix
 						else
 						{
 							int val = (int)row[j];
-							if (val >= vals) throw new Exception("Value out of range.");
+							if (val >= vals) throw new IllegalArgumentException("Value out of range.");
 							os.print(attrValue(j, val));
 						}
 					}
@@ -241,7 +251,7 @@ public class Matrix
 		}
 		catch (FileNotFoundException e)
 		{
-			throw new Exception("Error creating file: " + filename + ".");
+			throw new IllegalArgumentException("Error creating file: " + filename + ".");
 		}
 		finally
 		{
@@ -249,9 +259,9 @@ public class Matrix
 		}
 	}
 
-	/** Makes a rows-by-columns matrix of *ALL CONTINUOUS VALUES*.
-	 *  This method wipes out any data currently in the matrix. It also
-	 *  wipes out any meta-data. */
+	/// Makes a rows-by-columns matrix of *ALL CONTINUOUS VALUES*.
+	/// This method wipes out any data currently in the matrix. It also
+	/// wipes out any meta-data.
 	public void setSize(int rows, int cols)
 	{
 		m_data.clear();
@@ -267,10 +277,10 @@ public class Matrix
 		newRows(rows);
 	}
 
-	/** Clears this matrix and copies the meta-data from that matrix.
-	 *  In other words, it makes a zero-row matrix with the same number
-	 *  of columns as "that" matrix. You will need to call newRow or newRows
-	 *  to give the matrix some rows. */
+	/// Clears this matrix and copies the meta-data from that matrix.
+	/// In other words, it makes a zero-row matrix with the same number
+	/// of columns as "that" matrix. You will need to call newRow or newRows
+	/// to give the matrix some rows.
 	@SuppressWarnings("unchecked")
 	public void copyMetaData(Matrix that)
 	{
@@ -278,10 +288,10 @@ public class Matrix
 		m_attr_name = new ArrayList<String>(that.m_attr_name);
 		
 		// Make a deep copy of that.m_str_to_enum
-		m_str_to_enum = new ArrayList<Map<String, Integer>>();
-		for (Map<String, Integer> map : that.m_str_to_enum)
+		m_str_to_enum = new ArrayList<HashMap<String, Integer>>();
+		for (HashMap<String, Integer> map : that.m_str_to_enum)
 		{
-			Map<String, Integer> temp = new HashMap<String, Integer>();
+			HashMap<String, Integer> temp = new HashMap<String, Integer>();
 			for (Map.Entry<String, Integer> entry : map.entrySet())
 				temp.put(entry.getKey(), entry.getValue());
 			
@@ -289,10 +299,10 @@ public class Matrix
 		}
 		
 		// Make a deep copy of that.m_enum_to_string
-		m_enum_to_str = new ArrayList<Map<Integer, String>>();
-		for (Map<Integer, String> map : that.m_enum_to_str)
+		m_enum_to_str = new ArrayList<HashMap<Integer, String>>();
+		for (HashMap<Integer, String> map : that.m_enum_to_str)
 		{
-			Map<Integer, String> temp = new HashMap<Integer, String>();
+			HashMap<Integer, String> temp = new HashMap<Integer, String>();
 			for (Map.Entry<Integer, String> entry : map.entrySet())
 				temp.put(entry.getKey(), entry.getValue());
 			
@@ -300,9 +310,9 @@ public class Matrix
 		}
 	}
 
-	/** Adds a column to this matrix with the specified number of values. (Use 0 for
-	 *  a continuous attribute.) This method also sets the number of rows to 0, so
-	 *  you will need to call newRow or newRows when you are done adding columns. */
+	/// Adds a column to this matrix with the specified number of values. (Use 0 for
+	/// a continuous attribute.) This method also sets the number of rows to 0, so
+	/// you will need to call newRow or newRows when you are done adding columns.
 	public void newColumn(int vals)
 	{
 		m_data.clear();
@@ -310,8 +320,8 @@ public class Matrix
 		
 		m_attr_name.add(name);
 		
-		Map<String, Integer> temp_str_to_enum = new HashMap<String, Integer>();
-		Map<Integer, String> temp_enum_to_str = new HashMap<Integer, String>();
+		HashMap<String, Integer> temp_str_to_enum = new HashMap<String, Integer>();
+		HashMap<Integer, String> temp_enum_to_str = new HashMap<Integer, String>();
 		
 		for (int i = 0; i < vals; i++)
 		{
@@ -324,20 +334,20 @@ public class Matrix
 		m_enum_to_str.add(temp_enum_to_str);
 	}
 	
-	/** Adds a column to this matrix with 0 values (continuous data). */
+	/// Adds a column to this matrix with 0 values (continuous data).
 	public void newColumn()
 	{
 		this.newColumn(0);
 	}
 	
-	/** Adds n columns to this matrix, each with 0 values (continuous data). */
+	/// Adds n columns to this matrix, each with 0 values (continuous data).
 	public void newColumns(int n)
 	{
 		for (int i = 0; i < n; i++)
 			newColumn();
 	}
 	
-	/** Adds one new row to this matrix. Returns a reference to the new row. */
+	/// Adds one new row to this matrix. Returns a reference to the new row.
 	public double[] newRow()
 	{
 		int c = cols();
@@ -348,23 +358,23 @@ public class Matrix
 		return newRow;
 	}
 	
-	/** Adds 'n' new rows to this matrix */
+	/// Adds 'n' new rows to this matrix
 	public void newRows(int n)
 	{
 		for (int i = 0; i < n; i++)
 			newRow();
 	}
 	
-	/** Returns the number of rows in the matrix */
+	/// Returns the number of rows in the matrix
 	public int rows() { return m_data.size(); }
 	
-	/** Returns the number of columns (or attributes) in the matrix */
+	/// Returns the number of columns (or attributes) in the matrix
 	public int cols() { return m_attr_name.size(); }
 	
-	/** Returns the name of the specified attribute */
+	/// Returns the name of the specified attribute
 	public String attrName(int col) { return m_attr_name.get(col); }
 	
-	/** Returns the name of the specified value */
+	/// Returns the name of the specified value
 	public String attrValue(int attr, int val)
 	{		
 		String value = m_enum_to_str.get(attr).get(val);
@@ -373,10 +383,10 @@ public class Matrix
 		else return value;
 	}
 	
-	/** Returns a reference to the specified row */
+	/// Returns a reference to the specified row
 	public double[] row(int index) { return m_data.get(index); }
 	
-	/** Swaps the positions of the two specified rows */
+	/// Swaps the positions of the two specified rows
 	public void swapRows(int a, int b)
 	{
 		double[] temp = m_data.get(a);
@@ -384,11 +394,11 @@ public class Matrix
 		m_data.set(b, temp);
 	}
 	
-	/** Returns the number of values associated with the specified attribute (or column)
-	 *  0 = continuous, 2 = binary, 3 = trinary, etc. */
+	/// Returns the number of values associated with the specified attribute (or column)
+	/// 0 = continuous, 2 = binary, 3 = trinary, etc.
 	public int valueCount(int attr) { return m_enum_to_str.get(attr).size(); }
 	
-	/** Returns the mean of the elements in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.) */
+	/// Returns the mean of the elements in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.)
 	public double columnMean(int col)
 	{
 		double sum = 0.0;
@@ -406,7 +416,7 @@ public class Matrix
 		return sum / count;
 	}
 	
-	/** Returns the minimum element in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.) */
+	/// Returns the minimum element in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.)
 	public double columnMin(int col)
 	{
 		double min = Double.MAX_VALUE;
@@ -419,11 +429,11 @@ public class Matrix
 		
 		return min;
 	}
-	
-	/** Returns the maximum element in the specifed column. (Elements with the value UNKNOWN_VALUE are ignored.) */
+
+	/// Returns the maximum element in the specifed column. (Elements with the value UNKNOWN_VALUE are ignored.)
 	public double columnMax(int col)
 	{
-		double max = Double.MIN_VALUE;
+		double max = -Double.MAX_VALUE;
 		for (double[] list : m_data)
 		{
 			double val = list[col];
@@ -434,10 +444,10 @@ public class Matrix
 		return max;
 	}
 	
-	/** Returns the most common value in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.) */
+	/// Returns the most common value in the specified column. (Elements with the value UNKNOWN_VALUE are ignored.)
 	public double mostCommonValue(int col)
 	{
-		Map<Double, Integer> counts = new HashMap<Double, Integer>();
+		HashMap<Double, Integer> counts = new HashMap<Double, Integer>();
 		for (double[] list : m_data)
 		{
 			double val = list[col];
@@ -463,36 +473,34 @@ public class Matrix
 		
 		return value;
 	}
-	
-	/** Copies the specified rectangular portion of that matrix, and adds it to the bottom of this matrix.
-	 *  (If colCount does not match the number of columns in this matrix, then this matrix will be cleared first.) */
-	public void copyPart(Matrix that, int rowBegin, int colBegin, int rowCount, int colCount)
+
+	/// Copies the specified rectangular portion of that matrix, and puts it in the specified location in this matrix.
+	public void copyBlock(int destRow, int destCol, Matrix that, int rowBegin, int colBegin, int rowCount, int colCount)
 	{
+		if (destRow + rowCount > this.rows() || destCol + colCount > this.cols())
+			throw new IllegalArgumentException("Out of range for destination matrix.");
 		if (rowBegin + rowCount > that.rows() || colBegin + colCount > that.cols())
-			throw new IllegalArgumentException("Out of range.");
-		
+			throw new IllegalArgumentException("Out of range for source matrix.");
+
 		// Copy the specified region of meta-data
-		if (cols() != colCount)
-			setSize(0, colCount);
-		
 		for (int i = 0; i < colCount; i++)
 		{
-			m_attr_name.set  (i, that.m_attr_name.get(colBegin + i));
-			m_str_to_enum.set(i, that.m_str_to_enum.get(colBegin + i));
-			m_enum_to_str.set(i, that.m_enum_to_str.get(colBegin + i));
+			m_attr_name.set(destCol + i, that.m_attr_name.get(colBegin + i));
+			m_str_to_enum.set(destCol + i, new HashMap<String, Integer>(that.m_str_to_enum.get(colBegin + i)));
+			m_enum_to_str.set(destCol + i, new HashMap<Integer, String>(that.m_enum_to_str.get(colBegin + i)));
 		}
-		
-		// Copy the specified region of data		
+
+		// Copy the specified region of data
 		for (int i = 0; i < rowCount; i++)
 		{
 			double[] source = that.row(rowBegin + i);
-			double[] newrow = newRow();
+			double[] dest = this.row(destRow + i);
 			for(int j = 0; j < colCount; j++)
-				newrow[j] = source[colBegin + j];
+				dest[j] = source[colBegin + j];
 		}
 	}
 	
-	/** Sets every element in the matrix to the specified value. */
+	/// Sets every element in the matrix to the specified value.
 	public void setAll(double val)
 	{
 		for (double[] list : m_data) {
@@ -501,7 +509,7 @@ public class Matrix
 		}
 	}
 
-	/** Sets this to the identity matrix. */
+	/// Sets this to the identity matrix.
 	public void setToIdentity()
 	{
 		setAll(0.0);
@@ -510,8 +518,8 @@ public class Matrix
 			row(i)[i] = 1.0;
 	}
 
-	/** Throws an exception if that has a different number of columns than
-	 *  this, or if one of its columns has a different number of values. */
+	/// Throws an exception if that has a different number of columns than
+	/// this, or if one of its columns has a different number of values.
 	public void checkCompatibility(Matrix that)
 	{
 		int c = cols();

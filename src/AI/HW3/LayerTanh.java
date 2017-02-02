@@ -1,6 +1,6 @@
 package HW3;
-
 import java.util.Random;
+
 
 public class LayerTanh {
 	public Matrix weights; // rows are inputs, cols are outputs
@@ -32,8 +32,8 @@ public class LayerTanh {
 	void copy(LayerTanh src) {
 		if(src.weights.rows() != weights.rows() || src.weights.cols() != weights.cols())
 			throw new IllegalArgumentException("mismatching sizes");
-		weights.setSize(0, src.weights.cols());
-		weights.copyPart(src.weights, 0, 0, src.weights.rows(), src.weights.cols());
+		weights.setSize(src.weights.rows(), src.weights.cols());
+		weights.copyBlock(0, 0, src.weights, 0, 0, src.weights.rows(), src.weights.cols());
 		for(int i = 0; i < bias.length; i++) {
 			bias[i] = src.bias[i];
 		}

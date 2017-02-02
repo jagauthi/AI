@@ -1,24 +1,27 @@
 package HW3;
+// ----------------------------------------------------------------
+// The contents of this file are distributed under the CC0 license.
+// See http://creativecommons.org/publicdomain/zero/1.0/
+// ----------------------------------------------------------------
 
 import java.util.Iterator;
+import java.lang.StringBuilder;
 
-/** Provides static methods for operating on arrays of doubles */
+/// Provides several useful static methods for operating on arrays of doubles
 public class Vec
 {
-	public static void print(double[] vec) {
-		System.out.print("[");
+	public static String toString(double[] vec) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
 		if(vec.length > 0) {
-			System.out.print(Double.toString(vec[0]));
+			sb.append(Double.toString(vec[0]));
 			for(int i = 1; i < vec.length; i++) {
-				System.out.print("," + Double.toString(vec[i]));
+				sb.append(",");
+				sb.append(Double.toString(vec[i]));
 			}
 		}
-		System.out.print("]");
-	}
-
-	public static void println(double[] vec) {
-		print(vec);
-		System.out.println();
+		sb.append("]");
+		return sb.toString();
 	}
 
 	public static void setAll(double[] vec, double val) {

@@ -1,6 +1,6 @@
+package HW3;
 // The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
-package HW3;
 
 import java.awt.Graphics;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.awt.event.MouseEvent;
 
 class Controller implements MouseListener
 {
-	public static final long MAX_ITERS = 2000; // The maximum length of a game in frames (At 20 frames/sec, 18000 frames takes 15 minutes)
+	public static final long MAX_ITERS = 18000; // The maximum length of a game in frames (At 20 frames/sec, 18000 frames takes 15 minutes)
 
 	private Model model; // holds all the game data
 	private View view; // the GUI
@@ -24,6 +24,9 @@ class Controller implements MouseListener
 	private IAgent redAgent;
 	LinkedList<MouseEvent> mouseEvents; // a queue of mouse events (used by the human agent)
 	int selectedSprite; // the blue agent to draw a box around (used by the human agent)
+	private static long agent_frame_time = 0;
+	private long blue_time_balance;
+	private long red_time_balance;
 	private long iter;
 	private boolean amIblue;
 
@@ -39,11 +42,17 @@ class Controller implements MouseListener
 		this.model = new Model(this, secret_symbol);
 		this.model.initGame();
 		this.iter = 0;
+		blueAgent.reset();
+		redAgent.reset();
+		calibrateTimer();
 	}
 
 	Controller fork(IAgent myShadowAgent, IAgent opponentShadowAgent) {
 		amIblue = model.amIblue(secret_symbol);
 		Controller c = new Controller(secret_symbol, amIblue ? myShadowAgent : opponentShadowAgent, amIblue ? opponentShadowAgent : myShadowAgent);
+		c.agent_frame_time = agent_frame_time;
+		c.blue_time_balance = blue_time_balance;
+		c.red_time_balance = red_time_balance;
 		c.iter = iter;
 		c.amIblue = amIblue;
 		c.model = model.clone(c, secret_symbol);
@@ -62,22 +71,36 @@ class Controller implements MouseListener
 
 	boolean update() {
 		long timeA = System.nanoTime();
-		model.setPerspectiveBlue(secret_symbol); // Blue on left, Red on right
-		double[] blueActions = blueAgent.update(this, model);
+		try {
+			model.setPerspectiveBlue(secret_symbol); // Blue on left, Red on right
+			if(blue_time_balance >= 0)
+				blueAgent.update(model);
+		} catch(Exception e) {
+			model.setFlagEnergyBlue(secret_symbol, -100.0f);
+			e.printStackTrace();
+			return false;
+		}
 		long timeB = System.nanoTime();
-		model.setPerspectiveRed(secret_symbol); // Red on left, Blue on right
-		double[] redActions = redAgent.update(this, model);
+		try {
+			model.setPerspectiveRed(secret_symbol); // Red on left, Blue on right
+			if(red_time_balance >= 0)
+				redAgent.update(model);
+		} catch(Exception e) {
+			model.setFlagEnergyRed(secret_symbol, -100.0f);
+			e.printStackTrace();
+			return false;
+		}
 		long timeC = System.nanoTime();
+		blue_time_balance = Math.min(blue_time_balance + agent_frame_time + timeA - timeB, 20 * agent_frame_time);
+		red_time_balance = Math.min(red_time_balance + agent_frame_time + timeB - timeC, 20 * agent_frame_time);
 		if(iter++ >= MAX_ITERS)
 			return false; // out of time
-		model.update(blueActions, redActions);
+		model.update();
 		if(amIblue)
 			model.setPerspectiveBlue(secret_symbol); // Blue on left, Red on right
 		else
 			model.setPerspectiveRed(secret_symbol); // Red on left, Blue on right
-		double distSelf = (model.getX() - 300.0) * (model.getX() - 300.0) + (model.getY() - 300.0) * (model.getY() - 300.0);
-		double distOpp = (model.getXOpponent() - 300.0) * (model.getXOpponent() - 300.0) + (model.getYOpponent() - 300.0) * (model.getYOpponent() - 300.0);
-		return (distSelf <= Model.SQDEATH && distOpp < Model.SQDEATH);
+		return model.getFlagEnergySelf() >= 0.0f && model.getFlagEnergyOpponent() >= 0.0f;
 	}
 
 	Model getModel() { return model; }
@@ -86,6 +109,25 @@ class Controller implements MouseListener
 
 	void setSelectedSprite(int i) {
 		selectedSprite = i;
+	}
+
+	long getTimeBalance(Object secret_symbol, boolean blue) {
+		return blue ? blue_time_balance : red_time_balance;
+	}
+
+	private void calibrateTimer() {
+		if(agent_frame_time == 0) {
+			long timeA = System.nanoTime();
+			for(int i = 0; i < 420; i++)
+				for(int y = 0; y < 60; y++)
+					for(int x = 0; x < 120; x++)
+						model.getTravelSpeed(10 * x, 10 * y);
+			long timeB = System.nanoTime();
+			agent_frame_time = timeB - timeA;
+			//System.out.println("Cycles=" + Long.toString(agent_frame_time));
+		}
+		blue_time_balance = 20 * agent_frame_time;
+		red_time_balance = blue_time_balance;
 	}
 
 	MouseEvent nextMouseEvent() {
@@ -126,21 +168,24 @@ class Controller implements MouseListener
 		c.init();
 		while(c.update()) { }
 		c.model.setPerspectiveBlue(c.secret_symbol);
-		double distSelf = (c.model.getX() - 300.0) * (c.model.getX() - 300.0) + (c.model.getY() - 300.0) * (c.model.getY() - 300.0);
-		double distOpp = (c.model.getXOpponent() - 300.0) * (c.model.getXOpponent() - 300.0) + (c.model.getYOpponent() - 300.0) * (c.model.getYOpponent() - 300.0);
-		if(distSelf > Model.SQDEATH)
+		if(c.model.getFlagEnergySelf() < 0.0f && c.model.getFlagEnergyOpponent() >= 0.0f)
 			return -1;
-		else if(distOpp > Model.SQDEATH)
+		else if(c.model.getFlagEnergyOpponent() < 0.0f && c.model.getFlagEnergySelf() >= 0.0f)
 			return 1;
 		else
 			return 0;
 	}
 
+	String getBlueName()
+	{
+		return blueAgent.getClass().getName();
+	}
 
-	/// agents is an ArrayList of agents.
-	/// wins is an int[] of size agents.size().
-	/// verbose specifies whether to print progress to stdout.
-	/// returns an int[] that contains the index of the agent that ranks first, second, third, ...
+	String getRedName()
+	{
+		return redAgent.getClass().getName();
+	}
+
 	static int[] rankAgents(ArrayList<IAgent> agents, int[] wins, boolean verbose) throws Exception {
 
 		// Make every agent battle against every other agent

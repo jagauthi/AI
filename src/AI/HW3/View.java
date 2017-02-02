@@ -1,6 +1,6 @@
+package HW3;
 // The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
-package HW3;
 
 import javax.swing.JFrame;
 import java.awt.Graphics;
@@ -17,8 +17,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import java.awt.event.WindowEvent;
 import java.awt.event.MouseListener;
-import java.lang.InterruptedException;
-
 
 public class View extends JFrame implements ActionListener {
 	public static final int REPLAY_GRANULARITY = 30;
@@ -38,8 +36,8 @@ public class View extends JFrame implements ActionListener {
 
 		// Make the game window
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setTitle("Sumo Billiards");
-		this.setSize(603, 636);
+		this.setTitle("AI Tournament");
+		this.setSize(1203, 636);
 		this.panel = new MyPanel();
 		this.panel.addMouseListener(controller);
 		this.getContentPane().add(this.panel);
@@ -88,21 +86,130 @@ public class View extends JFrame implements ActionListener {
 		MySoundClip sound_doing;
 
 		MyPanel() throws Exception {
+			this.image_robot_blue = ImageIO.read(new File("robot_blue.png"));
+			this.image_robot_red = ImageIO.read(new File("robot_red.png"));
+			this.image_broken = ImageIO.read(new File("broken.png"));
+			this.image_flag_blue = ImageIO.read(new File("flag_blue.png"));
+			this.image_flag_red = ImageIO.read(new File("flag_red.png"));
 			this.sound_doing = new MySoundClip("metal_doing.wav", 3);
 		}
 
 		private void drawTerrain(Graphics g) {
-			g.setColor(new Color(0, 128, 0));
-			g.drawOval(0, 0, 599, 599);
+			byte[] terrain = model.getTerrain(secret_symbol);
+			int posBlue = 0;
+			int posRed = (60 * 60 - 1) * 4;
+			for(int y = 0; y < 60; y++) {
+				for(int x = 0; x < 60; x++) {
+					int bb = terrain[posBlue + 1] & 0xff;
+					int gg = terrain[posBlue + 2] & 0xff;
+					int rr = terrain[posBlue + 3] & 0xff;
+					g.setColor(new Color(rr, gg, bb));
+					g.fillRect(10 * x, 10 * y, 10, 10);
+					posBlue += 4;
+				}
+				for(int x = 60; x < 120; x++) {
+					int bb = terrain[posRed + 1] & 0xff;
+					int gg = terrain[posRed + 2] & 0xff;
+					int rr = terrain[posRed + 3] & 0xff;
+					g.setColor(new Color(rr, gg, bb));
+					g.fillRect(10 * x, 10 * y, 10, 10);
+					posRed -= 4;
+				}
+			}
 		}
 
 		private void drawSprites(Graphics g) {
-			Model.Sprite blue = model.getBlue(secret_symbol);
+			ArrayList<Model.Sprite> sprites_blue = model.getSpritesBlue(secret_symbol);
+			for(int i = 0; i < sprites_blue.size(); i++) {
+
+				// Draw the robot image
+				Model.Sprite s = sprites_blue.get(i);
+				if(s.energy >= 0) {
+					g.drawImage(image_robot_blue, (int)s.x - 12, (int)s.y - 32, null);
+
+					// Draw energy bar
+					g.setColor(new Color(0, 0, 128));
+					g.drawRect((int)s.x - 18, (int)s.y - 32, 3, 32);
+					int energy = (int)(s.energy * 32.0f);
+					g.fillRect((int)s.x - 17, (int)s.y - energy, 2, energy);
+				}
+				else
+					g.drawImage(image_broken, (int)s.x - 12, (int)s.y - 32, null);
+
+				// Draw selection box
+				if(i == controller.getSelectedSprite())
+				{
+					g.setColor(new Color(100, 0, 0));
+					g.drawRect((int)s.x - 22, (int)s.y - 42, 44, 57);
+				}
+			}
+			ArrayList<Model.Sprite> sprites_red = model.getSpritesRed(secret_symbol);
+			for(int i = 0; i < sprites_red.size(); i++) {
+
+				// Draw the robot image
+				Model.Sprite s = sprites_red.get(i);
+				if(s.energy >= 0) {
+					g.drawImage(image_robot_red, (int)(Model.XMAX - 1 - s.x) - 12, (int)(Model.YMAX - 1 - s.y) - 32, null);
+
+					// Draw energy bar
+					g.setColor(new Color(128, 0, 0));
+					g.drawRect((int)(Model.XMAX - 1 - s.x) + 14, (int)(Model.YMAX - 1 - s.y) - 32, 3, 32);
+					int energy = (int)(s.energy * 32.0f);
+					g.fillRect((int)(Model.XMAX - 1 - s.x) + 15, (int)(Model.YMAX - 1 - s.y) - energy, 2, energy);
+				}
+				else
+					g.drawImage(image_broken, (int)(Model.XMAX - 1 - s.x) - 12, (int)(Model.YMAX - 1 - s.y) - 32, null);
+			}
+		}
+
+		private void drawBombs(Graphics g) {
+			ArrayList<Model.Bomb> bombs = model.getBombsFlying(secret_symbol);
+			for(int i = 0; i < bombs.size(); i++) {
+				Model.Bomb b = bombs.get(i);
+				int x = (int)b.getX();
+				int y = (int)b.getY();
+				int height = (int)(0.01 * b.position * (b.distance - b.position));
+				g.setColor(new Color(128, 64, 192));
+				g.fillOval(x - 5, y - 5 - height, 10, 10);
+				g.setColor(new Color(100, 100, 100));
+				g.fillOval(x - 5, y - 5, 10, 10);
+			}
+			bombs = model.getBombsExploding(secret_symbol);
+			for(int i = 0; i < bombs.size(); i++) {
+				Model.Bomb b = bombs.get(i);
+				int x = (int)b.getX();
+				int y = (int)b.getY();
+				if(b.isDetonating())
+					sound_doing.play();
+				g.setColor(new Color(128, 0, 64));
+				int r = (int)(b.position - b.distance);
+				g.drawOval(x - r, y - r, 2 * r, 2 * r);
+				r = (int)Model.BLAST_RADIUS;
+				g.drawOval(x - r, y - r, 2 * r, 2 * r);
+			}
+		}
+
+		private void drawTitles(Graphics g) {
 			g.setColor(new Color(0, 0, 128));
-			g.fillOval((int)blue.x - (int)Model.RADIUS, (int)blue.y - (int)Model.RADIUS, (int)(Model.RADIUS + Model.RADIUS), (int)(Model.RADIUS + Model.RADIUS));
-			Model.Sprite red = model.getRed(secret_symbol);
+			g.drawString(controller.getBlueName(), (int)Model.XFLAG, (int)Model.YFLAG - 2 * FLAG_IMAGE_HEIGHT);
 			g.setColor(new Color(128, 0, 0));
-			g.fillOval((int)(Model.XMAX - red.x) - (int)Model.RADIUS, (int)(Model.YMAX - red.y) - (int)Model.RADIUS, (int)(Model.RADIUS + Model.RADIUS), (int)(Model.RADIUS + Model.RADIUS));
+			g.drawString(controller.getRedName(), (int)Model.XFLAG_OPPONENT - 80,  (int)Model.YFLAG_OPPONENT - 2 * FLAG_IMAGE_HEIGHT);
+		}
+
+		private void drawFlags(Graphics g) {
+			// Blue
+			g.drawImage(image_flag_blue, (int)Model.XFLAG, (int)Model.YFLAG - FLAG_IMAGE_HEIGHT, null);
+			g.setColor(new Color(0, 0, 128));
+			g.drawRect((int)Model.XFLAG - 3, (int)Model.YFLAG - 25, 3, 32);
+			int energy = (int)(model.getFlagEnergySelf() * 32.0f);
+			g.fillRect((int)Model.XFLAG - 2, (int)Model.YFLAG + 7 - energy, 2, energy);
+
+			// Red
+			g.drawImage(image_flag_red, (int)Model.XFLAG_OPPONENT,  (int)Model.YFLAG_OPPONENT - FLAG_IMAGE_HEIGHT, null);
+			g.setColor(new Color(128, 0, 0));
+			g.drawRect((int)Model.XFLAG_OPPONENT - 3, (int)Model.YFLAG_OPPONENT - 25, 3, 32);
+			energy = (int)(model.getFlagEnergyOpponent() * 32.0f);
+			g.fillRect((int)Model.XFLAG_OPPONENT - 2, (int)Model.YFLAG_OPPONENT + 7 - energy, 2, energy);
 		}
 
 		private void drawTime(Graphics g) {
@@ -111,8 +218,8 @@ public class View extends JFrame implements ActionListener {
 				replayPoints.add(controller.makeReplayPoint(secret_symbol));
 				//System.out.println("Recording " + Integer.toString(replayPoints.size()));
 			}
-			int i = 600 * iter / (int)Controller.MAX_ITERS;
-			int j = replayPoints.size() * REPLAY_GRANULARITY * 600 / (int)Controller.MAX_ITERS;
+			int i = 1200 * iter / (int)Controller.MAX_ITERS;
+			int j = replayPoints.size() * REPLAY_GRANULARITY * 1200 / (int)Controller.MAX_ITERS;
 			g.setColor(new Color(128, 128, 128));
 			g.fillRect(i, 600, j - i, 10);
 			g.setColor(new Color(0, 128, 128));
@@ -132,28 +239,24 @@ public class View extends JFrame implements ActionListener {
 				// Give the agents a chance to make decisions
 				if(!controller.update()) {
 					model.setPerspectiveBlue(secret_symbol);
-					double distSelf = (model.getX() - 300.0) * (model.getX() - 300.0) + (model.getY() - 300.0) * (model.getY() - 300.0);
-					double distOpp = (model.getXOpponent() - 300.0) * (model.getXOpponent() - 300.0) + (model.getYOpponent() - 300.0) * (model.getYOpponent() - 300.0);
-					if(distSelf > Model.SQDEATH)
+					if(model.getFlagEnergySelf() < 0.0f && model.getFlagEnergyOpponent() >= 0.0f)
 						System.out.println("\nRed wins!");
-					else if(distOpp > Model.SQDEATH)
+					else if(model.getFlagEnergyOpponent() < 0.0f && model.getFlagEnergySelf() >= 0.0f)
 						System.out.println("\nBlue wins!");
 					else
 						System.out.println("\nTie.");
-					try { Thread.sleep(1000); } catch(Exception e) {}
 					View.this.dispatchEvent(new WindowEvent(View.this, WindowEvent.WINDOW_CLOSING)); // The game is over, so close this window
 				}
 				skipframes = slomo;
 			}
 
-			// Play a sound
-			if(model.doing)
-				sound_doing.play();
-
 			// Draw the view
 			model.setPerspectiveBlue(secret_symbol);
 			drawTerrain(g);
+			drawTitles(g);
+			drawFlags(g);
 			drawSprites(g);
+			drawBombs(g);
 			drawTime(g);
 		}
 	}
@@ -165,25 +268,16 @@ public class View extends JFrame implements ActionListener {
 		MySoundClip(String filename, int copies) throws Exception {
 			clips = new Clip[copies];
 			for(int i = 0; i < copies; i++) {
-				try{
-					clips[i] = AudioSystem.getClip();
-					AudioInputStream ais = AudioSystem.getAudioInputStream(new File(filename));
-					clips[i].open(ais);
-				} catch(Exception e)
-				{
-					System.out.println("Unable to create audio stream. Oh well, ignoring the problem.");
-					clips[i] = null;
-				}
+				clips[i] = AudioSystem.getClip();
+				AudioInputStream ais = AudioSystem.getAudioInputStream(new File(filename));
+				clips[i].open(ais);
 			}
 			pos = 0;
 		}
 
 		void play() {
-			if(clips[pos] != null)
-			{
-				clips[pos].setFramePosition(0);
-				clips[pos].loop(0);
-			}
+			clips[pos].setFramePosition(0);
+			clips[pos].loop(0);
 			if(++pos >= clips.length)
 				pos = 0;
 		}

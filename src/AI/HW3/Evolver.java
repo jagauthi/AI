@@ -1,5 +1,6 @@
 package HW3;
 
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,18 +23,20 @@ public class Evolver {
 		int numIterations = 0;
 		Population finalPopulation = new Population(populationSize, true);
 		try {
-			while(Controller.doBattleNoGui(new NeuralAgent(finalPopulation.getFittest().genes), new NeuralAgent(Game.bob)) != 1) {
+			while(Controller.doBattleNoGui(new NeuralAgent(finalPopulation.getFittest().genes), new ReflexAgent()) != 1) {
 			//while(numIterations < numEvolutions) {
 				System.out.println("Generation " + (numIterations+1));
 				Population newPopulation = new Population(populationSize, false);
 				
 				//Populate the new population with new children, gotten by crossing 2 random (favored) parents
 				for(int i = 0; i < newPopulation.size(); i++) {
+					System.out.println("New baby :O");
 					Individual i1 = getNewParent(populations.get(numIterations));
 					Individual i2 = getNewParent(populations.get(numIterations));
 					Individual newChild = crossover(i1, i2);
 					newPopulation.saveIndividual(i, newChild);
 				}
+				System.out.println("\tMutating");
 				
 				//Mutate some the population for diversity
 				for(int i = 0; i < newPopulation.size(); i++) {
@@ -42,6 +45,7 @@ public class Evolver {
 				finalPopulation = newPopulation;
 				populations.add(finalPopulation);
 				numIterations++;
+				System.out.println("end");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -73,6 +77,7 @@ public class Evolver {
     }
 
     public void mutate(Individual indiv) {
+    	System.out.println("\t\tThis one");
         for (int i = 0; i < indiv.size(); i++) {
             if (Math.random() <= mutationRate) {
                 byte gene = (byte) Math.round(Math.random());

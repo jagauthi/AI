@@ -1,5 +1,4 @@
 package HW3;
-
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -174,44 +173,32 @@ public class NeuralNet {
 		l2.bias[1] = -0.2;
 		nn.layers.add(l2);
 
-		System.out.println("l1 weights:");
-		l1.weights.print();
-		System.out.println("l1 bias:");
-		Vec.println(l1.bias);
-		System.out.println("l2 weights:");
-		l2.weights.print();
-		System.out.println("l2 bias:");
-		Vec.println(l2.bias);
+		System.out.println("l1 weights:" + l1.weights.toString());
+		System.out.println("l1 bias:" + Vec.toString(l1.bias));
+		System.out.println("l2 weights:" + l2.weights.toString());
+		System.out.println("l2 bias:" + Vec.toString(l2.bias));
 
 		System.out.println("----Forward prop");
 		double in[] = new double[2];
 		in[0] = 0.3;
 		in[1] = -0.2;
 		double[] out = nn.forwardProp(in);
-		System.out.println("activation:");
-		Vec.println(out);
+		System.out.println("activation:" + Vec.toString(out));
 
 		System.out.println("----Back prop");
 		double targ[] = new double[2];
 		targ[0] = 0.1;
 		targ[1] = 0.0;
 		nn.backProp(targ);
-		System.out.println("error 2:");
-		Vec.println(l2.error);
-		System.out.println("error 1:");
-		Vec.println(l1.error);
-		
+		System.out.println("error 2:" + Vec.toString(l2.error));
+		System.out.println("error 1:" + Vec.toString(l1.error));
 		
 		nn.descendGradient(in, 0.1);
 		System.out.println("----Descending gradient");
-		System.out.println("l1 weights:");
-		l1.weights.print();
-		System.out.println("l1 bias:");
-		Vec.println(l1.bias);
-		System.out.println("l2 weights:");
-		l2.weights.print();
-		System.out.println("l2 bias:");
-		Vec.println(l2.bias);
+		System.out.println("l1 weights:" + l1.weights.toString());
+		System.out.println("l1 bias:" + Vec.toString(l1.bias));
+		System.out.println("l2 weights:" + l2.weights.toString());
+		System.out.println("l2 bias:" + Vec.toString(l2.bias));
 
 		if(Math.abs(l1.weights.row(0)[0] - 0.10039573704287) > 0.0000000001)
 			throw new IllegalArgumentException("failed");

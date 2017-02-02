@@ -1,5 +1,6 @@
 package HW3;
 
+
 public class Individual {
 	
 	static int geneLength = 291;

@@ -2,42 +2,15 @@ package HW3;
 // The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
 
-class NeuralAgent implements IAgent
+class ReflexAgent implements IAgent
 {
 	int index; // a temporary value used to pass values around
-	NeuralNet nn;
-	double[] in;
 
-	NeuralAgent(double[] weights) {
-		in = new double[20];
-		nn = new NeuralNet();
-		nn.layers.add(new LayerTanh(in.length, 8));
-		nn.layers.add(new LayerTanh(8, 10));
-		nn.layers.add(new LayerTanh(10, 3));
-		setWeights(weights);
+	ReflexAgent() {
 	}
 
 	public void reset() {
 	}
-
-	/// Returns the number of weights necessary to fully-parameterize this agent
-	int countWeights() {
-		int n = 0;
-		for(int i = 0; i < nn.layers.size(); i++)
-			n += nn.layers.get(i).countWeights();
-		return n;
-	}
-
-
-	/// Sets the parameters of this agent with the specified weights
-	void setWeights(double[] weights) {
-		if(weights.length != countWeights())
-			throw new IllegalArgumentException("Wrong number of weights. Got " + Integer.toString(weights.length) + ", expected " + Integer.toString(countWeights()));
-		int start = 0;
-		for(int i = 0; i < nn.layers.size(); i++)
-			start += nn.layers.get(i).setWeights(weights, start);
-	}
-
 
 	public static float sq_dist(float x1, float y1, float x2, float y2) {
 		return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
@@ -162,41 +135,8 @@ class NeuralAgent implements IAgent
 	}
 
 	public void update(Model m) {
-
-		// Compute some features
-		in[0] = m.getX(0) / 600.0 - 0.5;
-		in[1] = m.getY(0) / 600.0 - 0.5;
-		in[2] = m.getX(1) / 600.0 - 0.5;
-		in[3] = m.getY(1) / 600.0 - 0.5;
-		in[4] = m.getX(2) / 600.0 - 0.5;
-		in[5] = m.getY(2) / 600.0 - 0.5;
-		in[6] = nearestOpponent(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[7] = nearestOpponent(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[8] = nearestOpponent(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[9] = nearestBombTarget(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[10] = nearestBombTarget(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[11] = nearestBombTarget(m, m.getX(0), m.getY(0)) / 600.0 - 0.5;
-		in[12] = m.getEnergySelf(0);
-		in[13] = m.getEnergySelf(1);
-		in[14] = m.getEnergySelf(2);
-		in[15] = m.getEnergyOpponent(0);
-		in[16] = m.getEnergyOpponent(1);
-		in[17] = m.getEnergyOpponent(2);
-		in[18] = m.getFlagEnergySelf();
-		in[19] = m.getFlagEnergyOpponent();
-
-		// Determine what each agent should do
-		double[] out = nn.forwardProp(in);
-
-		// Do it
-		for(int i = 0; i < 3; i++)
-		{
-			if(out[i] < -0.333)
-				beDefender(m, i);
-			else if(out[i] > 0.333)
-				beAggressor(m, i);
-			else
-				beFlagAttacker(m, i);
-		}
+		beFlagAttacker(m, 0);
+		beAggressor(m, 1);
+		beDefender(m, 2);
 	}
 }
