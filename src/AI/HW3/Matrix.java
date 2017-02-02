@@ -532,4 +532,9 @@ public class Matrix
 				throw new IllegalArgumentException("Column " + i + " has mis-matching number of values.");
 		}
 	}
+	
+	public void changeValue(int x, int y, double value)
+	{
+		m_data.get(y)[x] = value;
+	}
 }
