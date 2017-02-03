@@ -552,7 +552,7 @@ public class Matrix
 	{
 		for(int i = 0; i < m_data.size(); i++)
 		{
-			for(int x = 0; x < m_data.get(0).length; i++)
+			for(int x = 0; x < m_data.get(0).length; x++)
 			{
 				System.out.print(m_data.get(i)[x] + " ");
 			}
