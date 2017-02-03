@@ -16,23 +16,20 @@ public class Main {
         
         b.displayBoard();
 
-        System.out.print("Who's first? (1 for compuer, 2 for user): ");
+        System.out.print("\nWho's first? (1 for computer, 2 for user): ");
         int choice = reader.nextInt();
         if(choice == 1){
-        	int x = rand.nextInt(3);
-        	int y = rand.nextInt(3);
-            System.out.println("Not doing anything with this yet...");
+        	int firstMove = rand.nextInt(8);
+        	b.makeMove(firstMove+1, false);
             b.displayBoard();
         }
         
         while (!b.gameOver()) {
-            System.out.println("Your move (Type row number, press enter, then column number): ");
-            int playerY = reader.nextInt();
-            int playerX = reader.nextInt();
-            while(!b.makeMove(playerX, playerY)) {
-            	System.out.println("Invalid, try again (Type row number, press enter, then column number): ");
-                playerY = reader.nextInt();
-                playerX = reader.nextInt();
+            System.out.print("\nYour move: ");
+            int playerMove = reader.nextInt();
+            while(!b.makeMove(playerMove, true)) {
+            	System.out.print("\nInvalid, try again: ");
+                playerMove = reader.nextInt();
             }
             
             b.displayBoard();
@@ -41,7 +38,7 @@ public class Main {
                 break;
             } 
             
-            System.out.println("This is where the AI will make a move hahah");
+            System.out.println("\nThis is where the AI will make a move hahah");
             
             b.displayBoard();
         }

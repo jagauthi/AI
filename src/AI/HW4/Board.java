@@ -13,6 +13,7 @@ public class Board {
 	{
 		System.out.println();
 		for(int i = 0; i < board.length; i++) {
+			
 			if(board[i] == 0) 
 				System.out.print(" " + (i+1) + " ");
 			else if(board[i] == -1) 
@@ -29,12 +30,24 @@ public class Board {
 			}
 		}
 		System.out.println();
-		System.out.println();
 	}
 	
-	public boolean makeMove(int x, int y)
+	public boolean makeMove(int squareNumber, boolean player)
 	{
-		return true;
+		int move = squareNumber-1;
+		if(move < 0 || move > 8)
+			return false;
+		
+		if(board[move] == 1 || board[move] == -1)
+			return false;
+		else if(player == true) {
+			board[move] = 1;
+			return true;
+		}
+		else {
+			board[move] = -1;
+			return true;
+		}
 	}
 
 	public boolean gameOver()
