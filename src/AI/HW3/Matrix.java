@@ -537,4 +537,26 @@ public class Matrix
 	{
 		m_data.get(y)[x] = value;
 	}
+	
+	public void killRow(int rowNumber)
+	{
+		m_data.remove(m_data.get(rowNumber));
+	}
+	
+	public void addRow(double[] newRow)
+	{
+		m_data.add(newRow);
+	}
+	
+	public void printMatrix()
+	{
+		for(int i = 0; i < m_data.size(); i++)
+		{
+			for(int x = 0; x < m_data.get(0).length; i++)
+			{
+				System.out.print(m_data.get(i)[x] + " ");
+			}
+			System.out.println();
+		}
+	}
 }
