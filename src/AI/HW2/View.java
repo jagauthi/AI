@@ -35,6 +35,7 @@ public class View extends JFrame implements ActionListener {
 		this.panel.addMouseListener(controller);
 		this.getContentPane().add(this.panel);
 		this.setVisible(true);
+		this.setResizable(false);
 
 		this.replayPoints = new ArrayList<Controller>();
 	}

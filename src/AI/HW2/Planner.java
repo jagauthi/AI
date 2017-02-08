@@ -134,7 +134,7 @@ public class Planner {
 	{
 		ArrayList<Node> neighbors = new ArrayList<Node>();
 		
-		if(n.state[0] > -10 && n.state[0] < Model.XMAX + 10 && n.state[1] > -10 && n.state[1] < Model.YMAX + 10)
+		if(n.state[0] > 10 && n.state[0] < Model.XMAX - 10 && n.state[1] > 10 && n.state[1] < Model.YMAX - 10)
 		{
 			neighbors.add(new Node(0, n, (n.state[0]+10), (n.state[1]-10) ) );
 			neighbors.add(new Node(0, n, (n.state[0]+10),(n.state[1])));
