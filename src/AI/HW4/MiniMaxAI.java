@@ -13,7 +13,7 @@ public class MiniMaxAI {
 
 	public int[] makeMove()
 	{
-		int[] result = miniMax(2, 1); // depth, max turn
+		int[] result = miniMax(2, -1); // depth, max turn
 		if(result == null) {
 			if(hasWon(1))
 				return new int[] {-1, 1};
