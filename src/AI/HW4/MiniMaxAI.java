@@ -45,7 +45,7 @@ public class MiniMaxAI {
 		else {
 			for(int[] move : possibleMoves) {
 				board.getBoard()[move[0]][move[1]] = player;
-				if(player == 1) {
+				if(player == -1) {
 
 					if(currentScore > bestScore) {
 						bestScore = currentScore;
@@ -54,7 +54,7 @@ public class MiniMaxAI {
 					}
 				}
 				else {
-					currentScore = miniMax(depth - 1, 1)[0];
+					currentScore = miniMax(depth - 1, -1)[0];
 					if(currentScore < bestScore) {
 						bestScore = currentScore;
 						bestCol = move[0];
