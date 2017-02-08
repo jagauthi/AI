@@ -13,7 +13,7 @@ public class MiniMaxAI {
 
 	public int[] makeMove()
 	{
-		int[] result = miniMax(2, -1); // depth, max turn
+		int[] result = miniMax(2, -1);
 		if(result == null) {
 			if(hasWon(1))
 				return new int[] {-1, 1};
@@ -106,7 +106,6 @@ public class MiniMaxAI {
 	    else
 	    	opponent = 1;
 	 
-		// First cell
 		if (board.getBoard()[col1][row1] == player) {
 			score = 1;
 		} 
@@ -114,50 +113,48 @@ public class MiniMaxAI {
 			score = -1;
 		}
 		 
-		// Second cell
 		if (board.getBoard()[col2][row2] == player) {
-			if (score == 1) {   // cell1 is mySeed
+			if (score == 1) { 
 				score = 10;
 			} 
-			else if (score == -1) {  // cell1 is oppSeed
+			else if (score == -1) {
 				return 0;
 			} 
-			else {  // cell1 is empty
+			else { 
 				score = 1;
 			}
 		} 
 		else if (board.getBoard()[col2][row2] == opponent) {
-			if (score == -1) { // cell1 is oppSeed
+			if (score == -1) {
 				score = -10;
 			} 
-			else if (score == 1) { // cell1 is mySeed
+			else if (score == 1) { 
 				return 0;
 			} 
-			else {  // cell1 is empty
+			else { 
 				score = -1;
 			}
 		}
 		 
-		// Third cell
 		if (board.getBoard()[col3][row3] == player) {
-			if (score > 0) {  // cell1 and/or cell2 is mySeed
+			if (score > 0) { 
 				score *= 10;
 			} 
-			else if (score < 0) {  // cell1 and/or cell2 is oppSeed
+			else if (score < 0) { 
 				return 0;
 			} 
-			else {  // cell1 and cell2 are empty
+			else { 
 				score = 1;
 			}
 		} 
 		else if (board.getBoard()[col3][row3] == opponent) {
-			if (score < 0) {  // cell1 and/or cell2 is oppSeed
+			if (score < 0) { 
 				score *= 10;
 			} 
-			else if (score > 1) {  // cell1 and/or cell2 is mySeed
+			else if (score > 1) { 
 				return 0;
 			} 
-			else {  // cell1 and cell2 are empty
+			else { 
 				score = -1;
 			}
 		}
@@ -168,9 +165,8 @@ public class MiniMaxAI {
 		"111000000", "000111000", "000000111", "100100100", "010010010", "001001001", "100010001", "001010100" 
 	};
  
-	/** Returns true if thePlayer wins */
 	public boolean hasWon(int player) {
-		String pattern = "";  // 9-bit pattern for the 9 cells
+		String pattern = "";
 		
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
