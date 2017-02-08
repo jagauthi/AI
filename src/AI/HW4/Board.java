@@ -2,29 +2,38 @@ package HW4;
 
 public class Board {
 	
-	int[] board;
+	int[][] board;
 	
 	public Board()
 	{
-		board = new int[9];
+		board = new int[3][3];
+	}
+	
+	public int[][] getBoard()
+	{
+		return board;
 	}
 	
 	public void displayBoard()
 	{
 		System.out.println();
-		for(int i = 0; i < board.length; i++) {
+		int counter = 1;
+		for(int col = 0; col < board.length; col++) {
+			for(int row = 0; row < board[0].length; row++) {
 			
-			if(board[i] == 0) 
-				System.out.print(" " + (i+1) + " ");
-			else if(board[i] == -1) 
-				System.out.print(" O ");
-			else 
-				System.out.print(" X ");
-			
-			if(i%3 != 2) {
-				System.out.print("|");
+				if(board[col][row] == 0) 
+					System.out.print(" " + counter + " ");
+				else if(board[col][row] == -1) 
+					System.out.print(" O ");
+				else 
+					System.out.print(" X ");
+				
+				if(row % 3 != 2) {
+					System.out.print("|");
+				}
+				counter++;
 			}
-			if(i%3 == 2 && i != 0 && i != 8) {
+			if(col%3 != 2 ) {
 				System.out.println();
 				System.out.println("---+---+---");
 			}
@@ -32,20 +41,19 @@ public class Board {
 		System.out.println();
 	}
 	
-	public boolean makeMove(int squareNumber, boolean player)
+	public boolean makeMove(int[] move, boolean player)
 	{
-		int move = squareNumber-1;
-		if(move < 0 || move > 8)
+		if(move[0] < 0 || move[0] > 2 || move[1] < 0 || move[1] > 2)
 			return false;
 		
-		if(board[move] == 1 || board[move] == -1)
+		if(board[move[0]][move[1]] == 1 || board[move[0]][move[1]] == -1)
 			return false;
 		else if(player == true) {
-			board[move] = 1;
+			board[move[0]][move[1]] = 1;
 			return true;
 		}
 		else {
-			board[move] = -1;
+			board[move[0]][move[1]] = -1;
 			return true;
 		}
 	}
@@ -53,10 +61,5 @@ public class Board {
 	public boolean gameOver()
 	{
 		return false;
-	}
-	
-	public int winner()
-	{
-		return 1;
 	}
 }

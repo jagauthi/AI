@@ -40,11 +40,24 @@ class Game
 				while( fighter1 == fighter2)
 					fighter2 = (int) (Math.random() * population.rows());
 				if(Controller.doBattleNoGui(new NeuralAgent(population.row(fighter1)), new NeuralAgent(population.row(fighter2))) == 1) {
-					population.killRow(fighter2);
+					if(Math.random() > 0.25)
+						population.killRow(fighter2);
+					else
+						population.killRow(fighter1);
+				}
+				else if(Controller.doBattleNoGui(new NeuralAgent(population.row(fighter1)), new NeuralAgent(population.row(fighter2))) == -1){
+					if(Math.random() > 0.25)
+						population.killRow(fighter1);
+					else
+						population.killRow(fighter2);
 				}
 				else {
-					population.killRow(fighter1);
+					if(Math.random() > 0.5)
+						population.killRow(fighter1);
+					else
+						population.killRow(fighter2);
 				}
+					
 			}
 			
 			//Make new babies to fill in the deaths (using crossover)
