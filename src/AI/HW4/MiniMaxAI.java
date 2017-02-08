@@ -14,30 +14,21 @@ public class MiniMaxAI {
 	public int[] makeMove()
 	{
 		int[] result = miniMax(2, -1);
-		if(result == null) {
-			if(hasWon(1))
-				return new int[] {-1, 1};
-			else
-				return new int[] {-1, -1};
-		}
-		else
-			return new int[] {result[1], result[2]};
+		return new int[] {result[1], result[2]};
 	}
 	
 	public int[] miniMax(int depth, int player)
 	{
 		ArrayList<int[]> possibleMoves = getPossibleMoves();
-		if(possibleMoves.size() == 0)
-			return null;
 		int bestScore = 0;
 		int currentScore = 0;
 		int bestCol = -1;
 		int bestRow = -1;
 		
 		if(player == 1)
-			bestScore = Integer.MIN_VALUE;
+			bestScore = Integer.MAX_VALUE; //This might need to be swapped with the other one
 		else
-			bestScore = Integer.MAX_VALUE;
+			bestScore = Integer.MIN_VALUE; //This might need to be swapped with the other one
 		
 		if(possibleMoves.size() == 0 || depth == 0) {
 			bestScore = checkScores(player);
@@ -46,7 +37,7 @@ public class MiniMaxAI {
 			for(int[] move : possibleMoves) {
 				board.getBoard()[move[0]][move[1]] = player;
 				if(player == -1) {
-
+					currentScore = miniMax(depth - 1, 1)[0];
 					if(currentScore > bestScore) {
 						bestScore = currentScore;
 						bestCol = move[0];
@@ -100,11 +91,7 @@ public class MiniMaxAI {
 	
 	private int evaluateLine(int col1, int row1, int col2, int row2, int col3, int row3, int player) {
 	    int score = 0;
-	    int opponent = 0;
-	    if(player == 1)
-	    	opponent = -1;
-	    else
-	    	opponent = 1;
+	    int opponent = -player;
 	 
 		if (board.getBoard()[col1][row1] == player) {
 			score = 1;

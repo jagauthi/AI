@@ -27,8 +27,7 @@ public class Main {
             b.displayBoard();
         }
         
-        int winner = 0;
-        while (winner == 0) {
+        while (true) {
             System.out.print("\nYour move: ");
             int playerMove = reader.nextInt();
             int playerCol = (playerMove -1) / 3;
@@ -41,21 +40,25 @@ public class Main {
             b.displayBoard();
             
             if (b.gameOver()) {
+            	System.out.println("\nGame over.\n");
                 break;
             } 
             
             int[] aiMove = ai.makeMove();
-            if(aiMove[0] == -1)
-            	winner = aiMove[1];
             b.makeMove(aiMove, false);
             
             b.displayBoard();
+            
+            if (b.gameOver()) {
+            	System.out.println("\nGame over.\n");
+                break;
+            } 
         }
         
-        if (winner == 1) {
+        if (b.winner == 1) {
             System.out.println("\nYou win.");
         } 
-        else if (winner == -1) {
+        else if (b.winner == -1) {
             System.out.println("\nYou lost against my fantastic AI.");
         } 
         else {

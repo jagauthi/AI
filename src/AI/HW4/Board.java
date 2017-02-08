@@ -3,10 +3,12 @@ package HW4;
 public class Board {
 	
 	int[][] board;
+	int winner;
 	
 	public Board()
 	{
 		board = new int[3][3];
+		winner = 0;
 	}
 	
 	public int[][] getBoard()
@@ -60,6 +62,118 @@ public class Board {
 
 	public boolean gameOver()
 	{
+		int humanCount = 0;
+		int aiCount = 0;
+		int tieCount = 0;
+		
+		//Check rows
+		for(int row = 0; row < 3; row++) {
+			humanCount = 0;
+			aiCount = 0;
+			for(int col = 0; col < 3; col++) {
+				if(board[col][row] == 1) {
+					tieCount++;
+					humanCount++;
+				}
+				else if(board[col][row] == -1) {
+					tieCount++;
+					aiCount++;
+				}
+				
+				if(humanCount == 3) {
+					winner = 1;
+					return true;
+				}
+				else if(aiCount == 3) {
+					winner = -1;
+					return true;
+				}
+			}
+			
+			if(tieCount == 9) {
+				winner = 0;
+				return true;
+			}
+		}
+
+		//Check columns
+		for(int col = 0; col < 3; col++) {
+			humanCount = 0;
+			aiCount = 0;
+			for(int row = 0; row < 3; row++) {
+				if(board[col][row] == 1) {
+					humanCount++;
+				}
+				else if(board[col][row] == -1) {
+					aiCount++;
+				}
+				
+				if(humanCount == 3) {
+					winner = 1;
+					return true;
+				}
+				else if(aiCount == 3) {
+					winner = -1;
+					return true;
+				}
+			}
+		}
+		
+		//Check first diagonal
+		humanCount = 0;
+		aiCount = 0;
+		for(int col = 0; col < 3; col++) {
+			for(int row = 0; row < 3; row++) {
+				if(row == col) {
+					if(board[col][row] == 1) {
+						humanCount++;
+					}
+					else if(board[col][row] == -1) {
+						aiCount++;
+					}
+					
+					if(humanCount == 3) {
+						winner = 1;
+						return true;
+					}
+					else if(aiCount == 3) {
+						winner = -1;
+						return true;
+					}
+				}
+			}
+		}
+		
+		//Check second diagonal
+		humanCount = 0;
+		aiCount = 0;
+		for(int col = 0; col < 3; col++) {
+			for(int row = 0; row < 3; row++) {
+				if((col == 0 && row == 2) || (row == 1 && col == 1) || (col == 2 && row == 0) ) {
+					if(board[col][row] == 1) {
+						humanCount++;
+					}
+					else if(board[col][row] == -1) {
+						aiCount++;
+					}
+					
+					if(humanCount == 3) {
+						winner = 1;
+						return true;
+					}
+					else if(aiCount == 3) {
+						winner = -1;
+						return true;
+					}
+				}
+			}
+		}
+		
 		return false;
 	}
 }
+
+
+
+
+
