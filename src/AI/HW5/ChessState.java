@@ -123,6 +123,7 @@ class ChessState {
 	/// Print a representation of the board to the specified stream
 	void printBoard(PrintStream stream)
 	{
+		stream.println();
 		stream.println("  A  B  C  D  E  F  G  H");
 		stream.print(" +");
 		for(int i = 0; i < 8; i++)
@@ -158,6 +159,7 @@ class ChessState {
 			stream.println();
 		}
 		stream.println("  A  B  C  D  E  F  G  H");
+		stream.println();
 	}
 
 	/// Pass in the coordinates of a square with a piece on it

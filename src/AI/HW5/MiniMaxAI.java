@@ -8,6 +8,7 @@ public class MiniMaxAI {
 	ChessState chessState;
 	int depth;
 	boolean white;
+	int count = 0;
 	
 	public MiniMaxAI(ChessState chessState, int depth, boolean white)
 	{
@@ -18,18 +19,21 @@ public class MiniMaxAI {
 
 	public int[] makeMove()
 	{
+		System.out.println("\nStarting turn for white=" + white);
 		int[] result;
 		try {
-			result = miniMax(depth, white);
+			result = miniMax(chessState, depth, white);
 		} 
 		catch (Exception e) {
-			result = new int[4];
+			e.printStackTrace();
+			result = new int[5];
 		}
 		return new int[] {result[1], result[2], result[3], result[4]};
 	}
 	
-	public int[] miniMax(int depth, boolean white) throws Exception
+	public int[] miniMax(ChessState chessState, int depth, boolean white) throws Exception
 	{
+		ChessState simulatedState = new ChessState(chessState);
 		ArrayList<ChessMove> possibleMoves = getPossibleMoves();
 		int bestScore = 0;
 		int currentScore = 0;
@@ -41,21 +45,21 @@ public class MiniMaxAI {
 		
 		ChessMove bestMove = new ChessMove();
 		if(possibleMoves.size() == 0 || depth == 0) {
-			bestScore = checkScores(white);
+			bestScore = checkScores(simulatedState, white);
 		}
 		else {
 			for(ChessMove move : possibleMoves) {
 				chessState.move(move.xSource, move.ySource, move.xDest, move.yDest);
 				
 				if(white == false) {
-					currentScore = miniMax(depth - 1, true)[0];
+					currentScore = miniMax(simulatedState, depth - 1, true)[0];
 					if(currentScore > bestScore) {
 						bestScore = currentScore;
 						bestMove = move;
 					}
 				}
 				else {
-					currentScore = miniMax(depth - 1, false)[0];
+					currentScore = miniMax(simulatedState, depth - 1, false)[0];
 					if(currentScore < bestScore) {
 						bestScore = currentScore;
 						bestMove = move;
@@ -74,15 +78,16 @@ public class MiniMaxAI {
 		while(iterator.hasNext()) {
 			possibleMoves.add(iterator.next());
 		}
-		
 		return possibleMoves;
 	}
 	
-	public int checkScores(boolean white)
+	public int checkScores(ChessState chessState, boolean white)
 	{
 		int score = chessState.heuristic(new Random());
-		
-	    return score;
+		if(white)
+			return score;
+		else
+			return -score;
 	}
  
 	public boolean hasWon(int player) {

@@ -23,47 +23,60 @@ public class Main {
 		while(!chessState.gameOver()) {
 			try{
 				chessState.printBoard(System.out);
-				System.out.println();
 				int[] move = new int[4];
 				if(player1) {
 					if(whiteDepth > 0) {
 						move = whiteAI.makeMove();
+						//System.out.println("White move: " + convertIntToChar(move[0]) + "" + (move[1]+1) + "" + convertIntToChar(move[2]) + "" + (move[3]+1));
 					}
 					else {
-						System.out.println("Your move?");
-						String humanMove = reader.nextLine();
-						if(humanMove.equals("q")) {
-							System.exit(0);
-						}
-						else {
-							for(int i = 0; i < 4; i++) {
-								if(i%2 == 0)
-									move[i] = convertCharToInt(humanMove.charAt(i));
-								else
-									move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)));
+						boolean validMove = false;
+						while(!validMove) {
+							System.out.println("Your move?");
+							String humanMove = reader.nextLine();
+							if(humanMove.equals("q")) {
+								System.exit(0);
 							}
-							//See if move is valid
+							else {
+								for(int i = 0; i < 4; i++) {
+									if(i%2 == 0)
+										move[i] = convertCharToInt(humanMove.charAt(i));
+									else
+										move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)))-1;
+								}
+								if(chessState.isValidMove(move[0], move[1], move[2], move[3]))
+									validMove = true;
+								else 
+									System.out.println("Invalid move, try again.");
+							}
 						}
 					}
 				}
 				else { //player 2's turn
 					if(blackDepth > 0) {
 						move = blackAI.makeMove();
+						//System.out.println("Black move: " + convertIntToChar(move[0]) + "" + (move[1]+1) + "" + convertIntToChar(move[2]) + "" + (move[3]+1));
 					}
 					else {
-						System.out.println("Your move?");
-						String humanMove = reader.nextLine();
-						if(humanMove.equals("q")) {
-							System.exit(0);
-						}
-						else {
-							for(int i = 0; i < 4; i++) {
-								if(i%2 == 0)
-									move[i] = convertCharToInt(humanMove.charAt(i));
-								else
-									move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)))-1;
+						boolean validMove = false;
+						while(!validMove) {
+							System.out.println("Your move?");
+							String humanMove = reader.nextLine();
+							if(humanMove.equals("q")) {
+								System.exit(0);
 							}
-							//See if move is valid
+							else {
+								for(int i = 0; i < 4; i++) {
+									if(i%2 == 0)
+										move[i] = convertCharToInt(humanMove.charAt(i));
+									else
+										move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)))-1;
+								}
+								if(chessState.isValidMove(move[0], move[1], move[2], move[3]))
+									validMove = true;
+								else 
+									System.out.println("Invalid move, try again.");
+							}
 						}
 					}
 				}
@@ -72,7 +85,6 @@ public class Main {
 					break;
 				}
 				chessState.move(move[0], move[1], move[2], move[3]);
-				chessState.printBoard(System.out);
 				
 				player1 = !player1;
 			}
@@ -90,7 +102,7 @@ public class Main {
 			System.out.println("Tie...?");
 	}
 	
-	public int convertCharToInt(char letter) {
+	public static int convertCharToInt(char letter) {
 		if(letter == 'a')
 			return 0;
 		else if(letter == 'b')
@@ -109,8 +121,27 @@ public class Main {
 			return 7;
 	}
 	
+	public static char convertIntToChar(int number) {
+		if(number == 0)
+			return 'a';
+		else if(number == 1)
+			return 'b';
+		else if(number == 2)
+			return 'c';
+		else if(number == 3)
+			return 'd';
+		else if(number == 4)
+			return 'e';
+		else if(number == 5)
+			return 'f';
+		else if(number == 6)
+			return 'g';
+		else 
+			return 'h';
+	}
+	
 	public static void main(String[] args) throws Exception {
-		new Main(2, 2);
+		new Main(0, 1);
 	}
 
 }
