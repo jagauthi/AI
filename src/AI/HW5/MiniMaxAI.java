@@ -8,7 +8,6 @@ public class MiniMaxAI {
 	ChessState chessState;
 	int depth;
 	boolean white;
-	int count = 0;
 	
 	public MiniMaxAI(ChessState chessState, int depth, boolean white)
 	{
@@ -19,10 +18,11 @@ public class MiniMaxAI {
 
 	public int[] makeMove()
 	{
-		System.out.println("\nStarting turn for white=" + white);
+		System.out.println("\nStarting turn for " + ((this.white) ? "White" : "Black"));
+		System.out.println();
 		int[] result;
 		try {
-			result = miniMax(chessState, depth, white);
+			result = miniMax(chessState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, white);
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -31,47 +31,45 @@ public class MiniMaxAI {
 		return new int[] {result[1], result[2], result[3], result[4]};
 	}
 	
-	public int[] miniMax(ChessState chessState, int depth, boolean white) throws Exception
+	public int[] miniMax(ChessState chessState, int depth, int alpha, int beta, boolean white) throws Exception
 	{
 		ChessState simulatedState = new ChessState(chessState);
-		ArrayList<ChessMove> possibleMoves = getPossibleMoves();
-		int bestScore = 0;
+		ArrayList<ChessMove> possibleMoves = getPossibleMoves(simulatedState, white);
 		int currentScore = 0;
-		
-		if(white)
-			bestScore = Integer.MAX_VALUE; 
-		else
-			bestScore = Integer.MIN_VALUE; 
 		
 		ChessMove bestMove = new ChessMove();
 		if(possibleMoves.size() == 0 || depth == 0) {
-			bestScore = checkScores(simulatedState, white);
+			currentScore = checkScores(simulatedState, white);
+			return new int[] {currentScore, bestMove.xSource, bestMove.ySource, bestMove.xDest, bestMove.yDest};
 		}
 		else {
 			for(ChessMove move : possibleMoves) {
-				chessState.move(move.xSource, move.ySource, move.xDest, move.yDest);
+				simulatedState.move(move.xSource, move.ySource, move.xDest, move.yDest);
 				
-				if(white == false) {
-					currentScore = miniMax(simulatedState, depth - 1, true)[0];
-					if(currentScore > bestScore) {
-						bestScore = currentScore;
+				if(white == this.white) {
+					currentScore = miniMax(simulatedState, depth - 1, alpha, beta, !this.white)[0];
+					if(currentScore > alpha) {
+						alpha = currentScore;
 						bestMove = move;
 					}
 				}
 				else {
-					currentScore = miniMax(simulatedState, depth - 1, false)[0];
-					if(currentScore < bestScore) {
-						bestScore = currentScore;
+					currentScore = miniMax(simulatedState, depth - 1, alpha, beta, this.white)[0];
+					if(currentScore < beta) {
+						beta = currentScore;
 						bestMove = move;
 					}
 				}
-				chessState.move(move.xDest, move.yDest, move.xSource, move.ySource); //Moves the piece back
+				simulatedState.move(move.xDest, move.yDest, move.xSource, move.ySource); //Moves the piece back
+				if (alpha >= beta) 
+					break;
 			}
 		}
+		int bestScore = (white == this.white) ? alpha : beta;
 		return new int[] {bestScore, bestMove.xSource, bestMove.ySource, bestMove.xDest, bestMove.yDest};
 	}
 	
-	public ArrayList<ChessMove> getPossibleMoves()
+	public ArrayList<ChessMove> getPossibleMoves(ChessState chessState, boolean white)
 	{
 		ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 		ChessMoveIterator iterator = new ChessMoveIterator(chessState, white);
@@ -84,7 +82,8 @@ public class MiniMaxAI {
 	public int checkScores(ChessState chessState, boolean white)
 	{
 		int score = chessState.heuristic(new Random());
-		if(white)
+		/*Not confident, but pretty sure this is the problem...*/
+		if(this.white)
 			return score;
 		else
 			return -score;

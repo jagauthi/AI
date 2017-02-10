@@ -277,10 +277,14 @@ class ChessState {
 			throw new Exception("out of range");
 		int target = getPiece(xDest, yDest);
 		int p = getPiece(xSrc, ySrc);
-		if(p == None)
+		if(p == None) {
+			System.out.println(Main.convertIntToChar(xSrc) + "" + (ySrc+1) + "->" + Main.convertIntToChar(xDest) + "" + (yDest+1));
 			throw new Exception("There is no piece in the source location");
-		if(target != None && isWhite(xSrc, ySrc) == isWhite(xDest, yDest))
+		}
+		if(target != None && isWhite(xSrc, ySrc) == isWhite(xDest, yDest)) {
+			System.out.println(Main.convertIntToChar(xSrc) + "" + (ySrc+1) + "->" + Main.convertIntToChar(xDest) + "" + (yDest+1));
 			throw new Exception("It is illegal to take your own piece");
+		}
 		if(p == Pawn && (yDest == 0 || yDest == 7))
 			p = Queen; // a pawn that crosses the board becomes a queen
 		boolean white = isWhite(xSrc, ySrc);
@@ -348,6 +352,11 @@ class ChessState {
 	public boolean gameOver()
 	{
 		return false;
+	}
+	
+	public void setWinner(int winner)
+	{
+		this.winner = winner;
 	}
 	
 	public int getWinner()

@@ -84,7 +84,10 @@ public class Main {
 					System.out.println("The move was 0, 0, 0, 0");
 					break;
 				}
-				chessState.move(move[0], move[1], move[2], move[3]);
+				if(chessState.move(move[0], move[1], move[2], move[3])) {
+					chessState.setWinner((player1 ? 1 : 2));
+					break;
+				}
 				
 				player1 = !player1;
 			}
@@ -141,7 +144,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new Main(0, 1);
+		new Main(2, 1);
 	}
 
 }
