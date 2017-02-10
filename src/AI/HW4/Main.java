@@ -68,6 +68,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
+		int bestScore = (1 == 1) ? 1 : 2;
 		new Main();
     }
 
