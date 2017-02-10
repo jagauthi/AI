@@ -36,7 +36,13 @@ public class Main {
 							System.exit(0);
 						}
 						else {
-							//parse the human's move and see if it's valid
+							for(int i = 0; i < 4; i++) {
+								if(i%2 == 0)
+									move[i] = convertCharToInt(humanMove.charAt(i));
+								else
+									move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)));
+							}
+							//See if move is valid
 						}
 					}
 				}
@@ -51,8 +57,13 @@ public class Main {
 							System.exit(0);
 						}
 						else {
-							//parse the human's move and see if it's valid
-							//save the value of the humans move to "move"
+							for(int i = 0; i < 4; i++) {
+								if(i%2 == 0)
+									move[i] = convertCharToInt(humanMove.charAt(i));
+								else
+									move[i] = Integer.parseInt(Character.toString(humanMove.charAt(i)))-1;
+							}
+							//See if move is valid
 						}
 					}
 				}
@@ -79,8 +90,27 @@ public class Main {
 			System.out.println("Tie...?");
 	}
 	
+	public int convertCharToInt(char letter) {
+		if(letter == 'a')
+			return 0;
+		else if(letter == 'b')
+			return 1;
+		else if(letter == 'c')
+			return 2;
+		else if(letter == 'd')
+			return 3;
+		else if(letter == 'e')
+			return 4;
+		else if(letter == 'f')
+			return 5;
+		else if(letter == 'g')
+			return 6;
+		else 
+			return 7;
+	}
+	
 	public static void main(String[] args) throws Exception {
-		new Main(3, 5);
+		new Main(2, 2);
 	}
 
 }
