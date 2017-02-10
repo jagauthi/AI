@@ -535,7 +535,7 @@ public class Matrix
 	
 	public void changeValue(int x, int y, double value)
 	{
-		m_data.get(y)[x] = value;
+		m_data.get(y)[x] += value;
 	}
 	
 	public void killRow(int rowNumber)
@@ -546,6 +546,27 @@ public class Matrix
 	public void addRow(double[] newRow)
 	{
 		m_data.add(newRow);
+	}
+	
+	public int getFittestMember()
+	{
+		int[] wins = new int[Game.populationSize];
+		ArrayList<IAgent> agents = new ArrayList<IAgent>();
+		for(int i = 0; i < Game.populationSize; i++) {
+			agents.add(new NeuralAgent(m_data.get(i)));
+		}
+		try {
+			Controller.rankAgents(agents, wins, false);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		int bestAgent = 0;
+		for(int i = 0; i < wins.length; i++) {
+			if(wins[i] > bestAgent)
+				bestAgent = i;
+		}
+		return bestAgent;
 	}
 	
 	public void printMatrix()

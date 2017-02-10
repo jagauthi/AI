@@ -19,6 +19,7 @@ class ChessState {
 	public static final int AllMask = 15;
 
 	int[] m_rows;
+	int winner = 0;
 
 	ChessState() {
 		m_rows = new int[8];
@@ -340,6 +341,16 @@ class ChessState {
 		pOutMoves.add(col);
 		pOutMoves.add(row);
 		return (p > 0);
+	}
+	
+	public boolean gameOver()
+	{
+		return false;
+	}
+	
+	public int getWinner()
+	{
+		return winner;
 	}
 }
 
