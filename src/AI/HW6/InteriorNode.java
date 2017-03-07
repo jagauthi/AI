@@ -9,8 +9,8 @@ public class InteriorNode extends Node{
 	Node parent;
 	ArrayList<Node> children;
 	
-	public InteriorNode() {
-		
+	public InteriorNode(Node parent) {
+		this.parent = parent;
 	}
 	
 	@Override
@@ -18,4 +18,11 @@ public class InteriorNode extends Node{
 		return false;
 	}
 
+	public void setAttribute(int attribute) {
+		this.attribute = attribute;
+	}
+	
+	public void setPivot(double pivot) {
+		this.pivot = pivot;
+	}
 }

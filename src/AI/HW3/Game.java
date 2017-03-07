@@ -4,7 +4,7 @@ import java.util.Random;
 
 class Game
 {
-	static int populationSize = 20;
+	static int populationSize = 25;
 	static int numGenes = 291;
 	static double mutationRate = 0.2;
 	static double crossoverRate = 0.7;

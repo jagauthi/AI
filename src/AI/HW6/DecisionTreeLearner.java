@@ -7,7 +7,8 @@ public class DecisionTreeLearner extends SupervisedLearner {
 	Node root;
 
 	public DecisionTreeLearner() {
-		name = "";
+		name = "DecisionTree";
+		root = new InteriorNode(null);
 	}
 
 	@Override
@@ -17,7 +18,16 @@ public class DecisionTreeLearner extends SupervisedLearner {
 
 	@Override
 	void train(Matrix features, Matrix labels) {
+		//build decision tree (recursively)
 		
+		double[] mode = new double[labels.cols()];
+		for(int i = 0; i < labels.cols(); i++)
+		{
+			if(labels.valueCount(i) == 0)
+				mode[i] = labels.columnMean(i);
+			else
+				mode[i] = labels.mostCommonValue(i);
+		}
 	}
 
 	@Override

@@ -144,7 +144,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new Main(2, 1);
+		new Main(1, 4);
 	}
 
 }

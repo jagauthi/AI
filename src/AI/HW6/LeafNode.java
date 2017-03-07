@@ -2,14 +2,16 @@ package HW6;
 
 public class LeafNode extends Node {
 	
-	public LeafNode() {
-		
+	double[] labels;
+	
+	public LeafNode(double[] labelVector) {
+		labels = labelVector;
 	}
 
 	@Override
 	boolean isLeaf() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return true;
 	}
 
 }
