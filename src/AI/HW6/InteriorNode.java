@@ -6,11 +6,11 @@ public class InteriorNode extends Node{
 
 	int attribute; // which attribute to divide on
 	double pivot; // which value to divide on
-	Node parent;
-	ArrayList<Node> children;
+	Node left;
+	Node right;
 	
-	public InteriorNode(Node parent) {
-		this.parent = parent;
+	public InteriorNode() {
+		
 	}
 	
 	@Override
