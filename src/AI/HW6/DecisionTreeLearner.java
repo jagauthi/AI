@@ -5,6 +5,7 @@ import java.util.Random;
 public class DecisionTreeLearner extends SupervisedLearner {
 	String name;
 	Node root;
+	int[] valueHolder;
 
 	public DecisionTreeLearner() {
 		name = "DecisionTree";
@@ -19,6 +20,9 @@ public class DecisionTreeLearner extends SupervisedLearner {
 	@Override
 	void train(Matrix features, Matrix labels) {
 		root = buildTree(features, labels);
+		valueHolder = new int[features.cols()];
+		for (int i=0; i < features.cols(); i++)
+			valueHolder[i] = features.valueCount(i);
 	}
 	
 	Node buildTree(Matrix features, Matrix labels) {
@@ -65,6 +69,41 @@ public class DecisionTreeLearner extends SupervisedLearner {
 			}
 		}
 		
+		int count = 0;
+		if(bFeatures.rows() != 0) {
+			while(Math.abs((double)aFeatures.rows()/(double)bFeatures.rows()) <= 6 && count < 5) { 
+				count++;
+				splitCol = random.nextInt(features.cols());
+				randomRow = random.nextInt(features.rows());
+				splitValue = features.row(randomRow)[splitCol];
+				
+				if(features.valueCount(splitCol) == 0) {
+					for(int i = 0; i < features.rows(); i++) {
+						if(features.row(i)[splitCol] < splitValue) {
+							Vec.copy(aFeatures.newRow(), features.row(i));
+							Vec.copy(aLabels.newRow(), labels.row(i));
+						}
+						else {
+							Vec.copy(bFeatures.newRow(), features.row(i));
+							Vec.copy(bLabels.newRow(), labels.row(i));
+						}
+					}
+				}
+				else {
+					for(int i = 0; i < features.rows(); i++) {
+						if(features.row(i)[splitCol] == splitValue) {
+							Vec.copy(aFeatures.newRow(), features.row(i));
+							Vec.copy(aLabels.newRow(), labels.row(i));
+						}
+						else {
+							Vec.copy(bFeatures.newRow(), features.row(i));
+							Vec.copy(bLabels.newRow(), labels.row(i));
+						}
+					}
+				}
+			}
+		}
+		
 		if(aFeatures.rows() < 1) {
 			return new LeafNode(bLabels);
 		}
@@ -85,11 +124,21 @@ public class DecisionTreeLearner extends SupervisedLearner {
 		Node node = root;
 		while(!node.isLeaf()) {
 			InteriorNode n = (InteriorNode)node;
-			if(in[n.attribute] <= n.pivot) {
-				node = n.left;
+			if(valueHolder[n.attribute] == 0) {
+				if(in[n.attribute] < n.pivot) {
+					node = n.left;
+				}
+				else {
+					node = n.right;
+				}
 			}
 			else {
-				node = n.right;
+				if(in[n.attribute] == n.pivot) {
+					node = n.left;
+				}
+				else {
+					node = n.right;
+				}
 			}
 		}
 		LeafNode leaf = (LeafNode)node;
