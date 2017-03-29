@@ -3,9 +3,7 @@ package HW6;
 import java.util.Random;
 
 public class DecisionTreeLearner extends SupervisedLearner {
-	
 	String name;
-	
 	Node root;
 
 	public DecisionTreeLearner() {
@@ -24,7 +22,7 @@ public class DecisionTreeLearner extends SupervisedLearner {
 	}
 	
 	Node buildTree(Matrix features, Matrix labels) {
-		if(labelsAreHomogeneous) {
+		if(features.rows() <= 1) {
 			return new LeafNode(labels);
 		}
 
@@ -42,22 +40,36 @@ public class DecisionTreeLearner extends SupervisedLearner {
 		bFeatures.copyMetaData(features);
 		bLabels.copyMetaData(labels);
 		
-		for(int i = 0; i < features.rows(); i++) {
-			if(features.row(i)[splitCol] < splitValue) {
-				Vec.copy(aFeatures.newRow(), features.row(i));
-				Vec.copy(aLabels.newRow(), labels.row(i));
+		if(features.valueCount(splitCol) == 0) {
+			for(int i = 0; i < features.rows(); i++) {
+				if(features.row(i)[splitCol] < splitValue) {
+					Vec.copy(aFeatures.newRow(), features.row(i));
+					Vec.copy(aLabels.newRow(), labels.row(i));
+				}
+				else {
+					Vec.copy(bFeatures.newRow(), features.row(i));
+					Vec.copy(bLabels.newRow(), labels.row(i));
+				}
 			}
-			else {
-				Vec.copy(bFeatures.newRow(), features.row(i));
-				Vec.copy(bLabels.newRow(), labels.row(i));
+		}
+		else {
+			for(int i = 0; i < features.rows(); i++) {
+				if(features.row(i)[splitCol] == splitValue) {
+					Vec.copy(aFeatures.newRow(), features.row(i));
+					Vec.copy(aLabels.newRow(), labels.row(i));
+				}
+				else {
+					Vec.copy(bFeatures.newRow(), features.row(i));
+					Vec.copy(bLabels.newRow(), labels.row(i));
+				}
 			}
 		}
 		
 		if(aFeatures.rows() < 1) {
-			return new LeafNode(bFeatures, bLabels);
+			return new LeafNode(bLabels);
 		}
 		if(bFeatures.rows() < 1) {
-			return new LeafNode(aFeatures, aLabels);
+			return new LeafNode(aLabels);
 		}
 		
 		InteriorNode n = new InteriorNode();

@@ -35,6 +35,7 @@ class Main
 	public static void main(String[] args)
 	{
 		testLearner(new BaselineLearner());
-		//testLearner(new RandomForest(50));
+		testLearner(new DecisionTreeLearner());
+		testLearner(new RandomForest(50));
 	}
 }
