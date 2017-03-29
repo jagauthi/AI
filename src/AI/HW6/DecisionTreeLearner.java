@@ -22,7 +22,7 @@ public class DecisionTreeLearner extends SupervisedLearner {
 	}
 	
 	Node buildTree(Matrix features, Matrix labels) {
-		if(features.rows() <= 1) {
+		if(features.rows() <= 5) {
 			return new LeafNode(labels);
 		}
 
@@ -85,7 +85,7 @@ public class DecisionTreeLearner extends SupervisedLearner {
 		Node node = root;
 		while(!node.isLeaf()) {
 			InteriorNode n = (InteriorNode)node;
-			if(in[n.attribute] < n.pivot) {
+			if(in[n.attribute] <= n.pivot) {
 				node = n.left;
 			}
 			else {
