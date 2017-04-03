@@ -2,14 +2,17 @@ package HW6;
 
 import java.util.Random;
 
+
 public class DecisionTreeLearner extends SupervisedLearner {
 	String name;
 	Node root;
 	int[] valueHolder;
+	Random random;
 
 	public DecisionTreeLearner() {
 		name = "DecisionTree";
 		root = new InteriorNode();
+		random = new Random();
 	}
 
 	@Override
@@ -24,101 +27,82 @@ public class DecisionTreeLearner extends SupervisedLearner {
 		for (int i=0; i < features.cols(); i++)
 			valueHolder[i] = features.valueCount(i);
 	}
-	
-	Node buildTree(Matrix features, Matrix labels) {
-		if(features.rows() <= 5) {
-			return new LeafNode(labels);
-		}
 
-		Random random = new Random();
-		int splitCol = random.nextInt(features.cols());
-		int randomRow = random.nextInt(features.rows());
-		double splitValue = features.row(randomRow)[splitCol];
-		
-		Matrix aFeatures = new Matrix();
-		Matrix aLabels = new Matrix();
-		Matrix bFeatures = new Matrix();
-		Matrix bLabels = new Matrix();
-		aFeatures.copyMetaData(features);
-		aLabels.copyMetaData(labels);
-		bFeatures.copyMetaData(features);
-		bLabels.copyMetaData(labels);
-		
-		if(features.valueCount(splitCol) == 0) {
-			for(int i = 0; i < features.rows(); i++) {
-				if(features.row(i)[splitCol] < splitValue) {
-					Vec.copy(aFeatures.newRow(), features.row(i));
-					Vec.copy(aLabels.newRow(), labels.row(i));
-				}
-				else {
-					Vec.copy(bFeatures.newRow(), features.row(i));
-					Vec.copy(bLabels.newRow(), labels.row(i));
-				}
-			}
-		}
-		else {
-			for(int i = 0; i < features.rows(); i++) {
-				if(features.row(i)[splitCol] == splitValue) {
-					Vec.copy(aFeatures.newRow(), features.row(i));
-					Vec.copy(aLabels.newRow(), labels.row(i));
-				}
-				else {
-					Vec.copy(bFeatures.newRow(), features.row(i));
-					Vec.copy(bLabels.newRow(), labels.row(i));
-				}
-			}
-		}
-		
-		int count = 0;
-		if(bFeatures.rows() != 0) {
-			while(Math.abs((double)aFeatures.rows()/(double)bFeatures.rows()) <= 6 && count < 5) { 
-				count++;
-				splitCol = random.nextInt(features.cols());
-				randomRow = random.nextInt(features.rows());
-				splitValue = features.row(randomRow)[splitCol];
-				
-				if(features.valueCount(splitCol) == 0) {
-					for(int i = 0; i < features.rows(); i++) {
-						if(features.row(i)[splitCol] < splitValue) {
-							Vec.copy(aFeatures.newRow(), features.row(i));
-							Vec.copy(aLabels.newRow(), labels.row(i));
-						}
-						else {
-							Vec.copy(bFeatures.newRow(), features.row(i));
-							Vec.copy(bLabels.newRow(), labels.row(i));
-						}
+	Node buildTree(Matrix features, Matrix labels)
+	{
+		 if (features.rows() < 10)
+			 return new LeafNode(labels);
+		 
+		 else
+		 {
+			int dim = random.nextInt(features.cols());
+			int splitCol = random.nextInt(features.cols());
+			int randomRow = random.nextInt(features.rows());
+			double splitValue = features.row(randomRow)[splitCol];
+			 
+			Matrix leftFeatures = new Matrix();
+			Matrix rightFeatures = new Matrix();
+			Matrix leftLabels = new Matrix();
+			Matrix rightLabels = new Matrix();		 
+			leftFeatures.copyMetaData(features);
+			rightFeatures.copyMetaData(features);
+			leftLabels.copyMetaData(labels);
+			rightLabels.copyMetaData(labels);
+
+			int leftCount = 0;
+			int rightCount = 0;
+			if (features.valueCount(dim) == 0)
+			{
+				for (int i=0; i < features.rows(); i++)
+				{
+					if (features.row(i)[dim] < splitValue) {
+						leftFeatures.newRow();
+						leftLabels.newRow();
+						leftFeatures.copyBlock(leftCount, 0, features, i, 0, 1, features.cols());
+						leftLabels.copyBlock(leftCount, 0, labels, i, 0, 1, labels.cols());
+						leftCount++;
 					}
-				}
-				else {
-					for(int i = 0; i < features.rows(); i++) {
-						if(features.row(i)[splitCol] == splitValue) {
-							Vec.copy(aFeatures.newRow(), features.row(i));
-							Vec.copy(aLabels.newRow(), labels.row(i));
-						}
-						else {
-							Vec.copy(bFeatures.newRow(), features.row(i));
-							Vec.copy(bLabels.newRow(), labels.row(i));
-						}
+					 
+					else {
+						rightFeatures.newRow();
+						rightLabels.newRow();
+						rightFeatures.copyBlock(rightCount, 0, features, i, 0, 1, features.cols());
+						rightLabels.copyBlock(rightCount, 0, labels, i, 0, 1, labels.cols());
+						rightCount++;
 					}
 				}
 			}
+			 
+			else
+			{
+				for (int i=0; i < features.rows(); i++)
+				{
+					if (features.row(i)[dim] == splitValue) {
+						leftFeatures.newRow();
+						leftLabels.newRow();
+						leftFeatures.copyBlock(leftCount, 0, features, i, 0, 1, features.cols());
+						leftLabels.copyBlock(leftCount, 0, labels, i, 0, 1, labels.cols());
+						leftCount++;
+					}
+					 
+					else {
+						rightFeatures.newRow();
+						rightLabels.newRow();
+						rightFeatures.copyBlock(rightCount, 0, features, i, 0, 1, features.cols());
+						rightLabels.copyBlock(rightCount, 0, labels, i, 0, 1, labels.cols());
+						rightCount++;
+					}		 				 
+				}
+			}
+			 
+			InteriorNode node = new InteriorNode();
+			node.left = buildTree(leftFeatures, leftLabels);
+			node.right = buildTree(rightFeatures, rightLabels);
+			node.attribute = dim;
+			node.pivot = splitValue;
+			return node;
 		}
-		
-		if(aFeatures.rows() < 1) {
-			return new LeafNode(bLabels);
-		}
-		if(bFeatures.rows() < 1) {
-			return new LeafNode(aLabels);
-		}
-		
-		InteriorNode n = new InteriorNode();
-		n.attribute = splitCol;
-		n.pivot = splitValue;
-		n.left = buildTree(aFeatures, aLabels);
-		n.right = buildTree(bFeatures, bLabels);
-		return n;
 	}
-
 	@Override
 	void predict(double[] in, double[] out) {
 		Node node = root;

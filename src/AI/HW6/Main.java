@@ -36,6 +36,6 @@ class Main
 	{
 		testLearner(new BaselineLearner());
 		testLearner(new DecisionTreeLearner());
-		testLearner(new RandomForest(50));
+		testLearner(new RandomForest(40));
 	}
 }
