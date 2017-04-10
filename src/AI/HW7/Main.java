@@ -26,9 +26,38 @@ public class Main {
 		
 		for(int i = 0; i < rows*cols; i++) {
 			for(int x = 0; x < rows*cols; x++) {
+				R[i][x] = 0;
 				Q[i][x] = 0;
 			}
 		}
+
+		//Setting the goal for the top right corner:
+		R[19][19] = 100;
+		R[18][19] = 100;
+		R[39][19] = 100;
+		
+		//Setting the wall along the column x=10
+		R[9][10] = Integer.MIN_VALUE;
+		R[11][10] = Integer.MIN_VALUE;
+		R[29][30] = Integer.MIN_VALUE;
+		R[31][30] = Integer.MIN_VALUE;
+		R[49][50] = Integer.MIN_VALUE;
+		R[51][50] = Integer.MIN_VALUE;
+		R[69][70] = Integer.MIN_VALUE;
+		R[71][70] = Integer.MIN_VALUE;
+		//Hole in the wall
+		//R[89][90] = Integer.MIN_VALUE;
+		//R[91][90] = Integer.MIN_VALUE;
+		//R[109][110] = Integer.MIN_VALUE;
+		//R[111][110] = Integer.MIN_VALUE;
+		R[129][130] = Integer.MIN_VALUE;
+		R[131][130] = Integer.MIN_VALUE;
+		R[149][150] = Integer.MIN_VALUE;
+		R[151][150] = Integer.MIN_VALUE;
+		R[169][170] = Integer.MIN_VALUE;
+		R[171][170] = Integer.MIN_VALUE;
+		R[189][190] = Integer.MIN_VALUE;
+		R[191][190] = Integer.MIN_VALUE;
 
 		int counter = 0;
 		while(counter < 100) {
