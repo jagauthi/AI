@@ -1,13 +1,16 @@
 package HW7;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Main {
 	
 	double alpha_k, gamma;
-	int rows = 20;
-	int cols = 10;
-	int[][] Q, R;
+	int rows = 10;
+	int cols = 20;
+	double[][] Q;
+	int[][] R;
+	String[] policy;
 	
 	public Main() {
 		
@@ -16,10 +19,10 @@ public class Main {
 		 * http://people.revoledu.com/kardi/tutorial/ReinforcementLearning/Q-Learning-Algorithm.htm
 		 */
 		
-		Q = new int[rows*cols][rows*cols]; //20 wide, 10 high
+		Q = new double[rows*cols][rows*cols]; //20 wide, 10 high
 		R = new int[rows*cols][rows*cols];
+		policy = new String[rows*cols];
 		
-		int goalState = 1;
 		alpha_k = 0.1;
 		gamma = 0.97;
 		Random random = new Random();
@@ -59,99 +62,93 @@ public class Main {
 		R[189][190] = Integer.MIN_VALUE;
 		R[191][190] = Integer.MIN_VALUE;
 
+		int goalState = 19;
 		int counter = 0;
-		while(counter < 100) {
+		while(counter < 10000) {
 			counter++;
 			int state = random.nextInt(rows*cols); //initial state
 			while(state != goalState) {
-				int action;
-				if(random.nextDouble() <= 0.05) {
-					action = random.nextInt(4);
-				}
-				else {
-					action = 0;
-					for(int candidate = 0; candidate < 4; candidate++) {
-						if(getQValue(state, candidate) > getQValue(state, action)) {
-							action = candidate;
-						}
-					}
-				}
+				int[] possibleNextStates = getPossibleActions(state);
+				int nextState = possibleNextStates[random.nextInt(possibleNextStates.length)];
+				double q = Q[state][nextState];
+				double maxQ = getMaxQValue(nextState);
+				int r = R[state][nextState];
+				double value = q + alpha_k * (r + gamma*maxQ-q);
+				Q[state][nextState] = value;
 				
-				doAction(state, action);
+				state = nextState;
 			}
 		}
 		
-		/*
-		// Pick an action
-		Let i be the current state;
-		if(rand.nextDouble() < 0.05)
-		{
-			// Explore (pick a random action)
-			action = rand.nextInt(4);
-		}
-		else
-		{
-			// Exploit (pick the best action)
-			action = 0;
-			for(int candidate = 0; candidate < 4; candidate++)
-				if(Q(i, candidate) > Q(i, action))
-					action = candidate;
-		}
-
-		// Do the action
-		do_action(action);
-		Let j be the new state
-
-		// Learn from that experience
-		Apply the equation below to update the Q-table.
-		Where a = action.
-		Q(i,a) refers to the Q-table entry for doing action "a" in state "i".
-		Q(j,b) refers to the Q-table entry for doing action "b" in state "j".
-		Use 0.1 for alpha^k. (Don't get "alpha^k" mixed up with "a".)
-		use 0.97 for gamma.
-		A(j) is the set of four possible actions, {<,>,^,v}.
-		r(i,a,j) is the reward you obtained when you landed in state j.
-
-		// Reset
-		If j is the goal state, teleport to the start state.
-		*/
-	}
-	
-	public int getQValue(int state, int action) {
-		int nextState = 0;
-		//Actions (in order): {<, >, ^, v}
-		if(action == 0) { //left
-			nextState = state - 1;
-		}
-		else if(action == 1) { //right
-			nextState = state + 1;
-		}
-		else if(action == 2) { //up
-			nextState = state - rows;
-		}
-		else if(action == 3) { //down
-			nextState = state + rows;
-		}
+		getPolicies();
 		
-		if(nextState < 0 || nextState >= rows*cols) {
-			return 0;
-		}
-		else {
-			return R[state][nextState] + (int)(gamma * getMaxQValue(state));
+		for(int i = 0; i < rows*cols; i++) {
+			System.out.print(policy[i] + " ");
+			if(i%20 == 19)
+				System.out.println();
 		}
 	}
 	
-	public int getMaxQValue(int state) {
-		int value0 = getQValue(state, 0);
-		int value1 = getQValue(state, 1);
-		int value2 = getQValue(state, 2);
-		int value3 = getQValue(state, 3);
+	public int[] getPossibleActions(int state) {
+		ArrayList<Integer> a = new ArrayList<Integer>();
 		
-		return Math.max(value0, Math.max(value1, Math.max(value2, value3)));
+		if(state > 19)
+			a.add(state - 20);
+		if(state < 180)
+			a.add(state + 20);
+		if(state % 20 > 0)
+			a.add(state - 1);
+		if(state % 20 < 19)
+			a.add(state + 1);
+		
+		int[] actions = new int[a.size()];
+		for(int i = 0; i < a.size(); i++) {
+			actions[i] = a.get(i);
+		}
+		return actions;
 	}
 	
-	public void doAction(int state, int action) {
-		System.out.println("Unimplemented :)");
+	public double getMaxQValue(int state) {
+		double max = Double.MIN_VALUE;
+		int[] possibleNextStates = getPossibleActions(state);
+		for(int i = 0; i < possibleNextStates.length; i++) {
+			double value = Q[state][possibleNextStates[i]];
+			if(value > max) {
+				max = value;
+			}
+		}
+		return max;
+	}
+	
+	public void getPolicies() {
+		for(int i = 0; i < rows*cols; i++) {
+			int[] possibleStates = getPossibleActions(i);
+			int nextState = i;
+			double value = Double.MIN_VALUE;
+			for(int x = 0; x < possibleStates.length; x++) {
+				if(Q[i][possibleStates[x]] > value) {
+					value = Q[i][possibleStates[x]];
+					nextState = possibleStates[x];
+				}
+			}
+			if(i % 20 == 10 && i != 90 && i != 110) {
+				policy[i] = "#";
+			}
+			else if(nextState == i - 1) {
+				policy[i] = "<";
+			}
+			else if(nextState == i - 20) {
+				policy[i] = "^";
+			}
+			else if(nextState == i + 1) {
+				policy[i] = ">";
+			}
+			else if(nextState == i + 20) {
+				policy[i] = "V";
+			}
+			else
+				policy[i] = "O";
+		}
 	}
 	
 	public static void main(String[] args) throws Exception
